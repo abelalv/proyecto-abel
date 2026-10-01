@@ -22,6 +22,31 @@ repositorios personales y académicos.
 
 ---
 
+## Cómo invocarlo (plantilla de prompt)
+
+No hace falta memorizar comandos: describe tu caso en lenguaje natural. Estas son las
+piezas que conviene incluir:
+
+```text
+@jan-project-standard
+
+Soy:         Jan  |  NO soy Jan → aquí mi nombre y correo
+Estado:      proyecto nuevo  |  proyecto existente (ya tiene README y/o CONSTITUTION.md)
+Repo:        git@github.com:<usuario>/<repo>.git
+Stack:       Python (uv) · ¿paquete o app? · ¿ty? · ¿Archify?
+Objetivo:    crear desde cero  |  estandarizar SIN borrar  |  solo auditar  |  añadir X
+Restricción: no elimines nada existente; mejora y completa.
+```
+
+**Reglas de convivencia (obligatorias):**
+
+- En un proyecto existente: **primero leer, luego proponer, luego aplicar**. Nunca reemplaces
+  archivos del usuario (README, `CONSTITUTION.md`, código) sin revisarlos.
+- Si **no eres Jan**: no uses rutas ni repos fijos; aporta tus datos (ver "Identidad Git").
+- Ante la duda, **audita** (`--audit`) y muestra el informe antes de tocar nada.
+
+---
+
 ## Cuándo usar este skill
 
 - Crear un proyecto o repositorio nuevo desde cero.
@@ -33,7 +58,7 @@ repositorios personales y académicos.
 
 ## Cuándo NO usarlo
 
-- Proyectos que no son de Jan y exigen otro estilo (respeta el `CONSTITUTION.md` del repo).
+- Proyectos que ya tienen su propio estándar y el usuario **no** quiere adoptar este.
 - Cambios triviales de una línea en un repo ya estandarizado (no re-scaffold).
 
 ---
@@ -104,6 +129,7 @@ Opciones más usadas:
 | `--sync` | Ejecuta `uv sync` y `uv run pre-commit install` al terminar. |
 | `--force` | Sobrescribe archivos existentes. |
 | `--dry-run` | Muestra qué haría sin escribir nada. |
+| `--audit` | **Solo audita** un proyecto existente (FALTA/DIFIERE/OK) sin escribir nada; infiere el contexto del repo. |
 
 > ⚠️ **Antes de sobrescribir:** si la carpeta destino ya tiene archivos (sobre todo un
 > `CONSTITUTION.md` o `README.md` propios), **no uses `--force` a ciegas**. Investiga,
@@ -160,20 +186,33 @@ se regenera con `deliver`. Detalle completo en [`references/archify.md`](referen
 
 ---
 
-## Modo B — Estandarizar un proyecto existente
+## Modo B — Mejorar un proyecto existente (no destructivo)
 
-1. **Audita** el proyecto contra el manifiesto de abajo; anota qué falta o difiere.
-2. **Lee** el `CONSTITUTION.md` y el `README.md` existentes antes de tocar nada
-   (son trabajo del usuario: no los reemplaces, **complétalos**).
-3. **Añade** los archivos ausentes uno a uno, adaptando variables
-   (`{{PROJECT_NAME}}`, `{{PACKAGE_NAME}}`, …) al proyecto real.
-4. **Migra** lo que aplique: `requirements.txt` → `pyproject.toml` con `uv add`;
+> **Contrato de no destrucción.** El objetivo no es reemplazar, es **completar y elevar**.
+> Un repo con historia, `README.md` o `CONSTITUTION.md` propios es trabajo del usuario:
+> se **lee, respeta y mejora**; nunca se borra ni se sobrescribe con `--force` a ciegas.
+
+0. **Audita sin tocar nada** (captura el contexto del propio repo):
+   ```bash
+   python3 <SKILL_DIR>/scripts/new_project.py --path . --audit
+   ```
+   Lee `pyproject.toml`, `.python-version`, `CONSTITUTION.md` y el remoto de git, y reporta
+   **FALTA / DIFIERE / OK**. `DIFIERE` puede ser personalización legítima: **revísala**.
+1. **Lee** `README.md`, `CONSTITUTION.md` y la estructura real antes de cambiar nada.
+2. **Propón** un plan (qué se añade, qué se completa) y aplícalo de forma **aditiva**:
+   ```bash
+   python3 <SKILL_DIR>/scripts/new_project.py --path . --name "..." --description "..."
+   ```
+   Sin `--force`, el scaffolder **omite** todo archivo que ya existe (solo crea lo que falta).
+3. **Fusiona los `DIFIERE` a mano:** conserva el contenido del usuario y **añade** lo que
+   falte (no reemplaces secciones; no borres lo propio).
+4. **Migra** solo si el usuario lo pide: `requirements.txt` → `pyproject.toml` con `uv add`;
    scripts sueltos → `src/<paquete>/`; `.ipynb` → `.py`.
-5. **Verifica** con `make check` y registra el cambio en el historial de la constitución.
+5. **Registra** el cambio en el historial de la constitución y verifica con `make check`.
 
-> El scaffolder sirve como referencia de las plantillas: puedes generar un proyecto
-> temporal en `/tmp` con `--dry-run` o copiando un archivo concreto desde
-> `assets/templates/`, y adaptarlo.
+> El `--audit` es la herramienta para "capturar más contexto": puedes correrlo las veces que
+> quieras sin efectos secundarios, incluso en repos grandes, y mostrar el informe antes de
+> proponer cambios.
 
 ---
 

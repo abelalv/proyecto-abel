@@ -41,6 +41,83 @@ npx skills add hamsomp3/jan_skills_repository --list
 > También puedes clonar y usar el script directamente:
 > `python3 skills/jan-project-standard/scripts/new_project.py --help`
 
+## Ejemplos de uso (copy-paste)
+
+Invoca la skill en lenguaje natural. Copia cualquiera de estos bloques y ajústalo.
+
+### 1 · Proyecto nuevo (soy Jan)
+
+```text
+@jan-project-standard crea un proyecto nuevo.
+Nombre: "Detector de Neumonía" · App con Streamlit · paquete Python.
+Descripción: "Clasificador de radiografías con Grad-CAM."
+Incluye Archify para el diagrama de arquitectura.
+```
+
+### 2 · Proyecto existente — estandarizar SIN borrar
+
+```text
+@jan-project-standard este proyecto ya existe y tiene README y CONSTITUTION.md.
+Repositorio remoto: git@github.com:pedro/mi-proyecto.git
+No elimines nada: audítalo, dime qué falta y complétalo.
+Respeta mi README y mi CONSTITUTION.md; solo mejora y añade.
+```
+
+### 3 · NO soy Jan (alumno / compañero)
+
+```text
+@jan-project-standard no soy Jan. Me llamo "Pedro Pérez" (pedro@example.com),
+mi repo es git@github.com:pedro/proyecto.git y ya existe con README.
+Quiero adoptar el estándar: uv, Ruff, pre-commit, Makefile y CONSTITUTION.md.
+No borres nada existente; completa lo que falte.
+```
+
+### 4 · Solo auditar (no toca nada)
+
+```text
+@jan-project-standard audita este proyecto existente y muéstrame el informe
+(FALTA / DIFIERE / OK) sin modificar nada.
+```
+
+### 5 · Añadir arquitectura (Archify)
+
+```text
+@jan-project-standard instala Archify y genera docs/arquitectura.html a partir
+de este repositorio; luego enlázalo en la sección de arquitectura del README.
+```
+
+### 6 · Identidad Git automática (macOS / Windows)
+
+```text
+@jan-project-standard no soy Jan. Configura mi identidad Git automática
+(includeIf): Pedro Pérez <pedro@example.com>, llave ~/.ssh/id_ed25519,
+carpeta ~/Repos. Estoy en macOS.
+```
+
+### 7 · Actualizar la constitución
+
+```text
+@jan-project-standard actualiza CONSTITUTION.md con el nuevo módulo de
+autenticación y registra la decisión en el historial. No borres lo anterior.
+```
+
+### Equivalentes por CLI (sin agente)
+
+```bash
+D=skills/jan-project-standard/scripts
+
+python3 $D/new_project.py --path . --audit                    # auditar (no escribe)
+python3 $D/new_project.py --path ./nuevo --name "Mi Proyecto" \
+    --description "..." --archify --git                        # crear
+python3 $D/new_project.py --path . --name "Mi Proyecto"        # completar (omite lo existente)
+python3 $D/setup_git_identity.py --name "Pedro Pérez" --email pedro@example.com \
+    --key ~/.ssh/id_ed25519 --dir ~/Repos --platform mac        # identidad Git automática
+```
+
+> **Regla de oro:** en un proyecto existente, sin `--force` el scaffolder **nunca** sobrescribe
+> archivos; solo crea los que faltan. Los cambios sobre archivos propios se hacen a mano,
+> fusionando.
+
 ## Estructura
 
 ```text

@@ -26,6 +26,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import tomllib
+
 SKILL_DIR = Path(__file__).resolve().parents[1]
 TEMPLATES_DIR = SKILL_DIR / "assets" / "templates"
 
@@ -140,6 +142,58 @@ def copy_templates(
             stats[result] += 1
             if result == "skipped":
                 print(f"  · omitido (ya existe): {dest.relative_to(target_root)}")
+
+
+def audit_project(
+    target_root: Path,
+    variables: dict[str, str],
+    flags: dict[str, bool],
+    missing: set[str],
+) -> list[tuple[str, str]]:
+    """Compara el proyecto existente con el estándar **sin escribir nada**.
+
+    Devuelve filas ``(estado, ruta)`` con estado ``FALTA``, ``DIFIERE`` o ``OK``.
+    Es la base del modo ``--audit`` (mejorar sin destruir).
+    """
+    rows: list[tuple[str, str]] = []
+
+    for source_name, dest_rel in TREES:
+        if source_name == "github" and not flags["GITHUB"]:
+            continue
+        if source_name == "agents" and not flags["AGENTS"]:
+            continue
+        source_root = TEMPLATES_DIR / source_name
+        if not source_root.is_dir():
+            continue
+
+        for path in sorted(source_root.rglob("*")):
+            if path.is_dir():
+                continue
+            rel = path.relative_to(source_root)
+            dest = target_root / dest_rel / rel
+            dest = Path(*[p for p in dest.parts if p not in ("", ".")])
+            rel_display = str(dest.relative_to(target_root))
+
+            if not dest.exists():
+                rows.append(("FALTA", rel_display))
+                continue
+            try:
+                raw = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                rows.append(("OK", rel_display))
+                continue
+            rendered = render(raw, variables, flags, missing)
+            existing = dest.read_text(encoding="utf-8", errors="replace")
+            rows.append(("OK" if existing == rendered else "DIFIERE", rel_display))
+
+    package = variables["PACKAGE_NAME"]
+    code_paths = (
+        [f"src/{package}/__init__.py", "tests"] if flags["PACKAGE"] else ["main.py", "tests"]
+    )
+    for rel_display in code_paths:
+        rows.append(("OK" if (target_root / rel_display).exists() else "FALTA", rel_display))
+
+    return rows
 
 
 def create_package(
@@ -264,7 +318,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Genera un proyecto conforme al estándar jan-project-standard.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--name", required=True, help="Nombre legible del proyecto.")
+    parser.add_argument("--name", help="Nombre legible del proyecto (salvo en modo --audit).")
     parser.add_argument("--path", default=".", help="Carpeta destino (por defecto: '.').")
     parser.add_argument("--repo", help="Nombre del repo en GitHub (por defecto: slug del nombre).")
     parser.add_argument(
@@ -316,11 +370,129 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--dry-run", action="store_true", help="Muestra qué haría sin escribir nada."
     )
+    parser.add_argument(
+        "--audit",
+        action="store_true",
+        help="Solo audita un proyecto existente: reporta FALTA/DIFIERE/OK sin escribir nada.",
+    )
     return parser
 
 
+def infer_audit_context(target_root: Path, args: argparse.Namespace) -> dict[str, bool]:
+    """Rellena ``args`` y deriva las banderas leyendo el proyecto existente.
+
+    Permite auditar con precisión un proyecto ya creado sin volver a pasar todos
+    los flags originales: el contexto se "captura" del propio repositorio.
+    """
+    data: dict = {}
+    pyproject = target_root / "pyproject.toml"
+    if pyproject.exists():
+        try:
+            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+        except tomllib.TOMLDecodeError:
+            data = {}
+
+    project = data.get("project", {}) if isinstance(data, dict) else {}
+    if isinstance(project, dict):
+        if not args.repo and project.get("name"):
+            args.repo = str(project["name"])
+        if not args.description and project.get("description"):
+            args.description = str(project["description"])
+        authors = project.get("authors") or []
+        if authors and isinstance(authors[0], dict):
+            args.author = args.author or authors[0].get("name")
+            args.email = args.email or authors[0].get("email")
+        urls = project.get("urls") or {}
+        url = str(urls.get("Repository") or urls.get("Homepage") or "")
+        match = re.search(r"github\.com[:/]+([^/]+)/([^/]+?)(?:\.git)?/?$", url)
+        if match:
+            args.owner = args.owner or match.group(1)
+            args.repo = args.repo or match.group(2)
+        version = re.search(r"(\d+\.\d+)", str(project.get("requires-python") or ""))
+        if version and args.python_version == "3.13":
+            args.python_version = version.group(1)
+
+    if not args.name:
+        constitution = target_root / "CONSTITUTION.md"
+        if constitution.exists():
+            match = re.search(
+                r"^#\s*CONSTITUTION\s*[—:-]\s*(.+?)\s*$",
+                constitution.read_text(encoding="utf-8"),
+                re.MULTILINE,
+            )
+            if match:
+                args.name = match.group(1)
+
+    if not args.package:
+        src = target_root / "src"
+        if src.is_dir():
+            packages = [
+                child.name
+                for child in src.iterdir()
+                if child.is_dir() and (child / "__init__.py").exists()
+            ]
+            if packages:
+                args.package = packages[0]
+
+    tool = data.get("tool", {}) if isinstance(data, dict) else {}
+    groups = data.get("dependency-groups", {}) if isinstance(data, dict) else {}
+    dev = groups.get("dev") if isinstance(groups, dict) else None
+    has_ty = isinstance(tool, dict) and bool(tool.get("ty"))
+    if isinstance(dev, list):
+        has_ty = has_ty or any(str(item).startswith("ty") for item in dev)
+
+    readme = target_root / "README.md"
+    readme_text = (
+        readme.read_text(encoding="utf-8", errors="replace").lower() if readme.exists() else ""
+    )
+
+    return {
+        "PACKAGE": ("build-system" in data) or (target_root / "src").is_dir(),
+        "TYPES": has_ty,
+        "GITHUB": (target_root / ".github").is_dir(),
+        "AGENTS": (target_root / "AGENTS.md").exists(),
+        "ARCHIFY": ("archify" in readme_text)
+        or (target_root / "docs" / "arquitectura.html").exists(),
+    }
+
+
+def run_audit(
+    target_root: Path,
+    variables: dict[str, str],
+    flags: dict[str, bool],
+    missing: set[str],
+) -> int:
+    """Imprime la auditoría del estándar sobre un proyecto existente (sin escribir)."""
+    if not target_root.exists():
+        print(f"\n✖ La carpeta no existe: {target_root}")
+        return 1
+
+    print(f"\n▶ Auditoría del estándar: {target_root}")
+    rows = audit_project(target_root, variables, flags, missing)
+    order = {"FALTA": 0, "DIFIERE": 1, "OK": 2}
+    symbol = {"FALTA": "✖", "DIFIERE": "≠", "OK": "✓"}
+    for status, rel in sorted(rows, key=lambda r: (order[r[0]], r[1])):
+        print(f"  {symbol[status]} {status:<7} {rel}")
+
+    counts = {status: sum(1 for r in rows if r[0] == status) for status in order}
+    print("\n── Resumen ───────────────────────────────────────────────")
+    print(f"  ✓ OK: {counts['OK']} · ≠ DIFIERE: {counts['DIFIERE']} · ✖ FALTA: {counts['FALTA']}")
+    print("\n  Modo NO destructivo:")
+    print("   · FALTA   -> se puede añadir con el scaffolder (omite lo existente).")
+    print("   · DIFIERE -> ya existe y NO coincide: puede ser personalización legítima.")
+    print("                 Revísalo y fusiona a mano; NUNCA uses --force a ciegas.")
+    if missing:
+        print(f"  ⚠ marcadores sin resolver: {', '.join(sorted(missing))}")
+    print()
+    return 0
+
+
 def main() -> int:
-    args = build_parser().parse_args()
+    parser = build_parser()
+    args = parser.parse_args()
+
+    if not args.name and not args.audit:
+        parser.error("--name es obligatorio (salvo en el modo --audit).")
 
     if args.minimal:
         args.no_github = True
@@ -334,10 +506,21 @@ def main() -> int:
         "ARCHIFY": args.archify,
     }
 
-    variables = build_variables(args)
     target_root = Path(args.path).expanduser().resolve()
+
+    if args.audit:
+        for key, value in infer_audit_context(target_root, args).items():
+            flags[key] = value
+
+    if not args.name:
+        args.name = target_root.name
+
+    variables = build_variables(args)
     missing: set[str] = set()
     stats = {"created": 0, "overwritten": 0, "skipped": 0}
+
+    if args.audit:
+        return run_audit(target_root, variables, flags, missing)
 
     print(f"\n▶ Proyecto: {variables['PROJECT_NAME']}")
     print(f"  Destino : {target_root}")
