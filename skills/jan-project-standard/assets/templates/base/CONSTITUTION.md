@@ -56,7 +56,8 @@
 | **Linting / Formato** | [Ruff](https://docs.astral.sh/ruff/) |
 | **Pre-commit** | [pre-commit](https://pre-commit.com) |
 | **CI/CD** | [GitHub Actions](.github/workflows/ci.yml) |
-| **Dependencias automáticas** | [Dependabot](.github/dependabot.yml) |
+{{#if ARCHIFY}}| **Diagramas de arquitectura** | [Archify](https://github.com/tt-a1i/archify) (HTML interactivo en `docs/`) |
+{{/if}}| **Dependencias automáticas** | [Dependabot](.github/dependabot.yml) |
 
 > ⚠️ **Regla dura:** toda gestión de dependencias y entornos pasa por `uv`. Está
 > **prohibido** `pip` y `requirements.txt`.

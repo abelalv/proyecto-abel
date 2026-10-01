@@ -38,7 +38,7 @@ TREES: list[tuple[str, str]] = [
 ]
 
 # Marcadores de bloque condicional reconocidos.
-FLAGS = ("PACKAGE", "TYPES", "GITHUB", "AGENTS")
+FLAGS = ("PACKAGE", "TYPES", "GITHUB", "AGENTS", "ARCHIFY")
 
 IF_RE = re.compile(r"\{\{#if\s+([A-Z_]+)\}\}(.*?)\{\{/if\}\}", re.DOTALL)
 UNLESS_RE = re.compile(r"\{\{#unless\s+([A-Z_]+)\}\}(.*?)\{\{/unless\}\}", re.DOTALL)
@@ -271,6 +271,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Solo lo esencial (equivale a --no-github --no-agents).",
     )
+    parser.add_argument(
+        "--archify",
+        action="store_true",
+        help="Incluye la sección de arquitectura (Archify) en el README.",
+    )
 
     parser.add_argument(
         "--git", action="store_true", help="Inicializa el repositorio git (rama main)."
@@ -297,6 +302,7 @@ def main() -> int:
         "TYPES": not args.no_types,
         "GITHUB": not args.no_github,
         "AGENTS": not args.no_agents,
+        "ARCHIFY": args.archify,
     }
 
     variables = build_variables(args)
@@ -312,6 +318,7 @@ def main() -> int:
         f" · types={'sí' if flags['TYPES'] else 'no'}"
         f" · github={'sí' if flags['GITHUB'] else 'no'}"
         f" · agents={'sí' if flags['AGENTS'] else 'no'}"
+        f" · archify={'sí' if flags['ARCHIFY'] else 'no'}"
     )
     if args.dry_run:
         print("  (dry-run: no se escribirá nada)")
@@ -342,9 +349,16 @@ def main() -> int:
     print("\n── Siguientes pasos ──────────────────────────────────────")
     print("  1. Completa las secciones marcadas de CONSTITUTION.md.")
     print("  2. Revisa README.md (badges, descripción, estructura).")
-    print(f"  3. cd {args.path} && uv sync && uv run pre-commit install")
-    print("  4. make check")
-    print(f"  5. git remote add origin {variables['SSH_URL']} && git push -u origin main")
+    if flags["ARCHIFY"]:
+        print("  3. Arquitectura: npx skills add tt-a1i/archify -g  (ver references/archify.md)")
+        print("     y genera docs/arquitectura.json + docs/arquitectura.html.")
+        print("  4. cd <path> && uv sync && uv run pre-commit install")
+        print("  5. make check")
+        print(f"  6. git remote add origin {variables['SSH_URL']} && git push -u origin main")
+    else:
+        print(f"  3. cd {args.path} && uv sync && uv run pre-commit install")
+        print("  4. make check")
+        print(f"  5. git remote add origin {variables['SSH_URL']} && git push -u origin main")
     print()
     return 0
 

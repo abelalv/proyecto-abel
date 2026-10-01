@@ -12,7 +12,7 @@ siguiendo el [estándar de Agent Skills](https://agentskills.io).
 
 | Skill | Descripción |
 |-------|-------------|
-| [`jan-project-standard`](./skills/jan-project-standard/SKILL.md) | Estandariza proyectos personales y académicos: `uv` + Astral, **src-layout**, Ruff, pre-commit, Makefile, `CONSTITUTION.md` como fuente única de verdad, Conventional Commits, README con badges, licencia MIT, gobernanza GitHub (PR/issue templates, CI, Dependabot, labels) y contexto para agentes (`AGENTS.md`, `.opencode/`, tgrep). |
+| [`jan-project-standard`](./skills/jan-project-standard/SKILL.md) | Estandariza proyectos personales y académicos: `uv` + Astral, **src-layout**, Ruff, pre-commit, Makefile, `CONSTITUTION.md` como fuente única de verdad, Conventional Commits, README con badges, licencia MIT, gobernanza GitHub (PR/issue templates, CI, Dependabot, labels), contexto para agentes (`AGENTS.md`, `.opencode/`, tgrep), **identidad Git automática** (`includeIf`, perfiles Jan y propio para macOS/Windows) y **diagramas de arquitectura con [Archify](https://github.com/tt-a1i/archify)**. |
 
 ## Instalación
 

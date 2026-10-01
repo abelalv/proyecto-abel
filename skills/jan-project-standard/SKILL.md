@@ -1,6 +1,6 @@
 ---
 name: jan-project-standard
-description: Estandariza proyectos personales y académicos siguiendo las convenciones de Jan Polanco Velasco. Scaffolding y gobierno de repositorios Python con uv/Astral (Python 3.13+), src-layout, Ruff, pre-commit, Makefile, pytest, CONSTITUTION.md como fuente única de verdad, Conventional Commits, README profesional con badges, licencia MIT, gobernanza de GitHub (plantillas de PR/issue, CI, Dependabot, labels) y archivos de contexto para agentes (AGENTS.md, .opencode/, tgrep). Úsala al crear un proyecto o repositorio nuevo, al redactar o actualizar un CONSTITUTION.md, al configurar uv + Ruff + pre-commit, al añadir un Makefile, al preparar un README con badges, al conectar un repo a GitHub, o al auditar/estandarizar un proyecto existente. Use when scaffolding a new Python repository, writing or updating a CONSTITUTION.md, setting up uv, Ruff, pre-commit or CI, or standardizing an existing project.
+description: Estandariza proyectos personales y académicos con las convenciones de Jan Polanco Velasco: Python con uv/Astral (3.13+), src-layout, Ruff, pre-commit, Makefile, pytest, CONSTITUTION.md como fuente única de verdad, Conventional Commits, README con badges, licencia MIT, gobernanza GitHub (PR/issue templates, CI, Dependabot, labels), contexto para agentes (AGENTS.md, .opencode/, tgrep), identidad Git automática (includeIf; perfil Jan o perfil propio en macOS/Windows) y diagramas de arquitectura con Archify. Úsala al crear o estandarizar un repo, redactar un CONSTITUTION.md, configurar uv/Ruff/pre-commit/CI, añadir un Makefile o README, configurar la identidad Git automática, generar un diagrama con Archify, o conectar el proyecto a GitHub. Use when scaffolding a Python repository, writing a CONSTITUTION.md, setting up uv, Ruff, pre-commit or CI, configuring automatic Git identity, generating an Archify diagram, or standardizing a project.
 license: MIT
 compatibility: Requiere Python 3 (el scaffolder usa solo la biblioteca estándar). Para aplicar el estándar al proyecto destino se recomienda uv, git y, opcionalmente, gh.
 metadata:
@@ -55,10 +55,12 @@ repositorios personales y académicos.
    `chore:`) en un solo idioma claro; descripciones en imperativo.
 8. **GitHub gobernado:** plantilla de Pull Request, plantillas de issue, CI, Dependabot,
    labels declarativas y rama `main` protegida por PRs.
-9. **README profesional:** badges, tabla de contenidos, información académica cuando
-   aplique, stack, primeros pasos, estructura, contribución y licencia.
-10. **Identidad Git automática:** la carpeta `~/Desktop/Repositorios/personal/` hereda
-    nombre, correo y llave SSH vía `includeIf` en `~/.gitconfig` (ver más abajo).
+9. **README profesional:** badges, tabla de contenidos, stack, primeros pasos, estructura,
+   arquitectura (opcional, con **Archify**), contribución y licencia.
+10. **Identidad Git automática:** la carpeta de proyectos hereda nombre, correo y llave SSH
+    vía `includeIf` en `~/.gitconfig`. **Perfil A** para Jan
+    (`~/Desktop/Repositorios/personal/`); **Perfil B** para cualquier otro usuario (macOS o
+    Windows), y **solo si lo pide** (ver [`references/git-identity.md`](references/git-identity.md)).
 
 ---
 
@@ -91,6 +93,7 @@ Opciones más usadas:
 | `--python-version` | Versión de Python (por defecto `3.13`). |
 | `--app` | Proyecto de aplicación (sin paquete ni build-system), en vez de src-layout. |
 | `--minimal` | Solo lo esencial: sin `.github`, sin `AGENTS.md`/`.opencode`, sin extras. |
+| `--archify` | Incluye la sección **Arquitectura del proyecto** (Archify) en el README y la fila en la constitución. |
 | `--no-types` | Omite `ty` (tipado estático) de dependencias, Makefile y docs. |
 | `--no-github` | No genera `.github/`. |
 | `--no-agents` | No genera `AGENTS.md` ni `.opencode/`. |
@@ -135,6 +138,22 @@ git push -u origin main
 
 Luego protege `main` y verifica que la CI esté en verde. Detalle en
 [`references/github.md`](references/github.md).
+
+### Paso 5 · Diagrama de arquitectura (opcional, Archify)
+
+Si el proyecto necesita un mapa de arquitectura en el README (documentación viva), instala
+la skill [Archify](https://github.com/tt-a1i/archify) y genera el diagrama:
+
+```bash
+npx skills add tt-a1i/archify -g
+# Luego, en el chat:
+#   "Analiza este repositorio y usa Archify para crear un diagrama de arquitectura de
+#    runtime. 8–12 componentes, un camino principal, dependencias externas y límites."
+```
+
+El resultado queda en `docs/arquitectura.json` (fuente versionada) y `docs/arquitectura.html`
+(artefacto interactivo), y se enlaza desde el README. **No** se edita el HTML a mano:
+se regenera con `deliver`. Detalle completo en [`references/archify.md`](references/archify.md).
 
 ---
 
@@ -182,6 +201,7 @@ Luego protege `main` y verifica que la CI esté en verde. Detalle en
 | `src/<paquete>/` | Código del paquete (src-layout). |
 | `tests/` | Pruebas con pytest (patrón AAA). |
 | `docs/` | Documentación, ADRs, spikes e investigación. |
+| `docs/arquitectura.{json,html}` | Diagrama interactivo de arquitectura (Archify); el JSON es la fuente. Ver [`references/archify.md`](references/archify.md). |
 
 ---
 
@@ -217,23 +237,32 @@ Carga estos archivos **solo cuando los necesites** (divulgación progresiva):
 | [`references/constitution.md`](references/constitution.md) | Anatomía completa del `CONSTITUTION.md` sección por sección, con ejemplos. |
 | [`references/python-stack.md`](references/python-stack.md) | `uv`, `pyproject.toml`, Ruff, Makefile, pre-commit, `.editorconfig`, `.gitignore`. |
 | [`references/github.md`](references/github.md) | Creación del repo, remotos SSH, badges, plantillas, CI, Dependabot, labels, ramas. |
-| [`references/agent-context.md`](references/agent-context.md) | `AGENTS.md`, `.opencode/rules/`, tgrep e identidad Git automática. |
+| [`references/agent-context.md`](references/agent-context.md) | `AGENTS.md`, `.opencode/rules/` y tgrep. |
+| [`references/git-identity.md`](references/git-identity.md) | Identidad Git automática (`includeIf`): perfil Jan y perfil propio para macOS/Windows. |
+| [`references/archify.md`](references/archify.md) | Diagramas de arquitectura interactivos con Archify (instalación, tipos, validate/deliver, README). |
 | [`references/slidev.md`](references/slidev.md) | Presentaciones con Slidev (proyectos de curso): monolito, hub, reglas de sintaxis, export. |
 
 ---
 
-## Identidad Git automática (contexto de la máquina)
+## Identidad Git automática (`includeIf`)
 
-Dentro de `~/Desktop/Repositorios/personal/`, `~/.gitconfig` incluye:
+Configura Git para que todo repositorio bajo una carpeta use **automáticamente** un nombre,
+un correo y una llave SSH. Es una de las piezas más útiles del estándar: elimina flags y
+`gh auth` por proyecto. **Hay dos perfiles** y el agente debe decidir cuál aplica
+(detalle en [`references/git-identity.md`](references/git-identity.md)).
+
+### Perfil A — Soy Jan (dueño de esta skill)
+
+Carpeta canónica `~/Desktop/Repositorios/personal/`:
 
 ```ini
+# ~/.gitconfig
 [includeIf "gitdir:~/Desktop/Repositorios/personal/"]
     path = ~/.gitconfig-personal
 ```
 
-Y `~/.gitconfig-personal` define:
-
 ```ini
+# ~/.gitconfig-personal
 [user]
     name = Jan Polanco V.
     email = hamsomp3@gmail.com
@@ -241,12 +270,29 @@ Y `~/.gitconfig-personal` define:
     sshCommand = ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes
 ```
 
-**Efecto:** todo repo dentro de esa carpeta usa automáticamente el nombre, correo y
-llave SSH correctos, sin flags ni `gh auth` por proyecto. Preferir remotos **SSH**
-(`git@github.com:hamsomp3/<repo>.git`); HTTPS puede resolver con un token de otra cuenta.
+**Efecto:** todo repo bajo esa carpeta usa el nombre, correo y llave correctos. Preferir
+remotos **SSH** (`git@github.com:hamsomp3/<repo>.git`); HTTPS puede resolver con un token
+de otra cuenta.
 
-> ⚙️ Esta sección es configuración **local de la máquina**: nunca se commitea como
-> parte del proyecto (vive en la constitución solo como nota, no como archivo del repo).
+### Perfil B — NO soy Jan (alumno, compañero, otro usuario)
+
+Aquí **no** sirve la ruta fija de Jan. Si el usuario pide identidad automática y no es Jan,
+**pregúntale primero** su nombre, correo, llave SSH y carpeta de proyectos, y luego configura
+`includeIf` en **su** carpeta y **su** sistema operativo (macOS o Windows). Script listo:
+
+```bash
+python3 <SKILL_DIR>/scripts/setup_git_identity.py \
+  --name "Pedro Pérez" --email pedro@example.com \
+  --key ~/.ssh/id_ed25519 --dir ~/Repos/personal --platform mac
+# Windows: --key C:/Users/pedro/.ssh/id_ed25519 --dir C:/Users/pedro/Repos --platform windows
+```
+
+El script respalda `~/.gitconfig`, es idempotente y tiene un modo `--print` que solo muestra
+los bloques sin escribir nada. Pasos manuales y gotchas (orden de `includeIf`, `gitdir/i:`,
+rutas con `/` en Windows, `IdentitiesOnly`) en [`references/git-identity.md`](references/git-identity.md).
+
+> ⚙️ **Nunca** se commitea: es configuración **local de la máquina**. Vive en la constitución
+> solo **como nota** (no como archivo del repo), y **solo se aplica si el usuario lo pide**.
 
 ---
 
@@ -274,6 +320,8 @@ Antes de dar por terminado un proyecto o un cambio:
 - [ ] `LICENSE` presente (MIT por defecto).
 - [ ] `.github/` con PR template, issue templates, CI, Dependabot y labels (si aplica).
 - [ ] `AGENTS.md` (y `.opencode/rules/tgrep.md`) describen el proyecto para agentes (si aplica).
+- [ ] Identidad Git automática configurada **si el usuario lo pidió** (perfil A para Jan / perfil B para otros).
+- [ ] Diagrama de arquitectura con Archify en `docs/` y enlazado desde el README (si aplica).
 - [ ] Sin secretos, datos personales ni artefactos pesados versionados.
 - [ ] El historial de decisiones de la constitución registra los cambios significativos.
 

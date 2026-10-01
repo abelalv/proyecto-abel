@@ -31,7 +31,8 @@
 - [Stack tecnológico](#-stack-tecnológico)
 - [Primeros pasos](#-primeros-pasos)
 - [Calidad y automatización](#-calidad-y-automatización)
-- [Estructura del repositorio](#-estructura-del-repositorio)
+{{#if ARCHIFY}}- [Arquitectura del proyecto](#-arquitectura-del-proyecto)
+{{/if}}- [Estructura del repositorio](#-estructura-del-repositorio)
 - [Flujo de trabajo y contribución](#-flujo-de-trabajo-y-contribución)
 - [Licencia](#-licencia)
 
@@ -103,6 +104,19 @@ make check   # lint + formato{{#if TYPES}} + tipos{{/if}} + pruebas
 | `make test` | `pytest`. |
 {{#if PACKAGE}}| `make build` | Construye el paquete (sdist + wheel). |
 {{/if}}
+{{#if ARCHIFY}}## 🗺️ Arquitectura del proyecto
+
+Mapa de arquitectura interactivo (autocontenido, generado con [Archify](https://github.com/tt-a1i/archify)).
+Ábrelo en el navegador: `docs/arquitectura.html`.
+
+<!-- Reemplaza esta línea cuando generes el diagrama real:
+[![Arquitectura del proyecto (tema oscuro)](docs/arquitectura.visual-check.2048x1320.dark.png)](docs/arquitectura.html)
+-->
+
+> Genera/actualiza con: `npx skills add tt-a1i/archify -g` y luego
+> `node bin/archify.mjs deliver architecture docs/arquitectura.json docs/arquitectura.html --quality showcase`.
+> El JSON es la fuente versionada; el HTML no se edita a mano.
+
 ## 📂 Estructura del repositorio
 
 ```text
