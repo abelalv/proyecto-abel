@@ -61,7 +61,10 @@ jan_skills_repository/
 1. Crea `skills/<nombre>/SKILL.md` con frontmatter `name` (igual al de la carpeta) y `description`.
 2. Añade `references/`, `scripts/` y `assets/` según lo necesites.
 3. Valida el frontmatter (nombre en minúsculas, sin guiones dobles, ≤ 64 caracteres).
-4. Añádela a la tabla de **Skills disponibles** de este README.
+4. **Entrecomilla los valores con `: `** (dos puntos + espacio). YAML lo interpreta como un
+   mapeo anidado y falla con *mapping values are not allowed in this context*:
+   `description: "Texto: con dos puntos"`. Vale para `description`, `title`, etc.
+5. Añádela a la tabla de **Skills disponibles** de este README.
 
 ## Licencia
 
