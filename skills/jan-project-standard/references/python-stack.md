@@ -34,7 +34,7 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.13"
-authors = [{ name = "Jan Polanco V.", email = "hamsomp3@gmail.com" }]
+authors = [{ name = "<Tu Nombre>", email = "<tu-correo>" }]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
@@ -43,9 +43,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/hamsomp3/mi-proyecto"
-Repository = "https://github.com/hamsomp3/mi-proyecto"
-Issues = "https://github.com/hamsomp3/mi-proyecto/issues"
+Homepage = "https://github.com/<tu-usuario>/mi-proyecto"
+Repository = "https://github.com/<tu-usuario>/mi-proyecto"
+Issues = "https://github.com/<tu-usuario>/mi-proyecto/issues"
 
 [build-system]
 requires = ["uv_build>=0.12.2,<0.13.0"]

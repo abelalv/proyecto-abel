@@ -13,9 +13,12 @@ flags manuales—. Se implementa con `includeIf` en `~/.gitconfig`.
 
 ---
 
-## Perfil A — Soy Jan (dueño de esta skill)
+## Perfil A — Ejemplo: configuración del autor de la skill
 
-La carpeta canónica es `~/Desktop/Repositorios/personal/`. `~/.gitconfig` incluye:
+> Es solo un **ejemplo real** de cómo se ve un perfil funcionando. Cualquier otro usuario
+> debe seguir el **Perfil B** con sus propios datos.
+
+La carpeta canónica del autor es `~/Desktop/Repositorios/personal/`. `~/.gitconfig` incluye:
 
 ```ini
 [includeIf "gitdir:~/Desktop/Repositorios/personal/"]
@@ -161,9 +164,9 @@ ssh -T git@github.com                           # -> Hi pedro!
 
 ## Cómo decide el agente
 
-1. ¿El usuario **es Jan** (o pide el perfil canónico de `~/Desktop/Repositorios/personal/`)?
-   → **Perfil A**.
-2. ¿El usuario **no es Jan** y pide identidad automática? → **Perfil B**: primero pregunta
-   nombre, correo, llave y carpeta; luego usa el script o los bloques manuales de su SO.
+1. ¿El usuario pide configurar una carpeta **existente** con datos ya definidos (el patrón
+   del Perfil A)? → úsalo como referencia, pero **confirma sus datos** antes de escribir.
+2. En cualquier otro caso, si el usuario pide identidad automática → **Perfil B**: primero
+   pregunta nombre, correo, llave y carpeta; luego usa el script o los bloques manuales de su SO.
 3. ¿No lo pide? → No toques `~/.gitconfig`; limítate a documentarlo como nota en la
    constitución del proyecto.

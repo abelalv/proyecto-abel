@@ -4,18 +4,18 @@ Cómo se crea, conecta, protege y presenta un repositorio del estándar.
 
 ## Creación y conexión
 
-La cuenta es **`hamsomp3`** y la autenticación preferida es **SSH** con
+La cuenta es **tu usuario de GitHub** (`<tu-usuario>`) y la autenticación preferida es **SSH** con
 `~/.ssh/id_ed25519` (la identidad se resuelve sola dentro de
 `~/Desktop/Repositorios/personal/`; ver `references/agent-context.md`).
 
 ```bash
 # Opción 1 — repo nuevo, ya conectado y con push inicial
-gh repo create hamsomp3/<repo> --private --source=. --remote=origin --push
+gh repo create <tu-usuario>/<repo> --private --source=. --remote=origin --push
 
 # Opción 2 — el repo ya existe en GitHub
 git init
 git branch -M main
-git remote add origin git@github.com:hamsomp3/<repo>.git
+git remote add origin git@github.com:<tu-usuario>/<repo>.git
 git add -A
 git commit -m "chore: bootstrap del proyecto"
 git push -u origin main
@@ -38,7 +38,7 @@ Activa, como mínimo:
 
 ```bash
 # Ejemplo (requiere permisos de admin)
-gh api -X PUT repos/hamsomp3/<repo>/branches/main/protection \
+gh api -X PUT repos/<tu-usuario>/<repo>/branches/main/protection \
   -F required_status_checks.strict=true \
   -F 'required_status_checks.contexts[]=Calidad' \
   -F enforce_admins=true \
@@ -69,13 +69,13 @@ Estructura recomendada (ver `assets/templates/base/README.md`):
 ```markdown
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue.svg)](https://www.python.org/downloads/)
-[![CI](https://github.com/hamsomp3/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/hamsomp3/<repo>/actions/workflows/ci.yml)
+[![CI](https://github.com/<tu-usuario>/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<tu-usuario>/<repo>/actions/workflows/ci.yml)
 [![Managed with uv](https://img.shields.io/badge/managed%20with-uv-de5fe9.svg)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=precommit&logoColor=white)](./.pre-commit-config.yaml)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-fe5196.svg)](https://conventionalcommits.org)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
-[![skills.sh](https://skills.sh/b/hamsomp3/<repo>)](https://skills.sh/hamsomp3/<repo>)
+[![skills.sh](https://skills.sh/b/<tu-usuario>/<repo>)](https://skills.sh/<tu-usuario>/<repo>)
 ```
 
 > Usa **endpoint badges** (Ruff) o **badges dinámicos** (última acción, último commit)

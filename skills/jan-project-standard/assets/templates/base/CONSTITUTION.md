@@ -159,10 +159,10 @@ git push
 
 > Configuración específica de la máquina local. **NO incluir en commits.**
 
-Dentro de `~/Desktop/Repositorios/personal/`, `~/.gitconfig` aplica:
+Dentro de la carpeta de proyectos, `~/.gitconfig` aplica:
 
 ```ini
-[includeIf "gitdir:~/Desktop/Repositorios/personal/"]
+[includeIf "gitdir:~/Repos/"]
     path = ~/.gitconfig-personal
 ```
 
@@ -170,8 +170,11 @@ Dentro de `~/Desktop/Repositorios/personal/`, `~/.gitconfig` aplica:
 
 ```ini
 [user]
-    name = Jan Polanco V.
-    email = hamsomp3@gmail.com
+    name = <Tu Nombre>
+    email = <tu-correo>
 [core]
     sshCommand = ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes
 ```
+
+> Ajusta la carpeta y tus datos. Guía completa (macOS/Windows) en el skill
+> `jan-project-standard` → `references/git-identity.md`.

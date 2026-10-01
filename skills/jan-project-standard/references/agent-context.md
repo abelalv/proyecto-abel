@@ -47,7 +47,7 @@ automática en cada sesión.
 `~/.gitconfig` (global):
 
 ```ini
-[includeIf "gitdir:~/Desktop/Repositorios/personal/"]
+[includeIf "gitdir:~/Repos/"]
     path = ~/.gitconfig-personal
 ```
 
@@ -55,15 +55,15 @@ automática en cada sesión.
 
 ```ini
 [user]
-    name = Jan Polanco V.
-    email = hamsomp3@gmail.com
+    name = <Tu Nombre>
+    email = <tu-correo>
 [core]
     sshCommand = ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes
 ```
 
-**Efecto:** los repos bajo `~/Desktop/Repositorios/personal/` usan automáticamente el
-nombre, el correo y la llave SSH correctos. No requiere `gh`, variables de entorno ni
-flags por proyecto.
+**Efecto:** los repos bajo esa carpeta usan automáticamente el nombre, el correo y la llave
+SSH correctos. No requiere `gh`, variables de entorno ni flags por proyecto. Configuración y
+perfiles (macOS/Windows) en [`git-identity.md`](git-identity.md).
 
 > Esto es configuración de la **máquina**, no del repositorio: se documenta en la
 > constitución como nota y **nunca** se versiona un archivo con secretos.
@@ -73,8 +73,8 @@ flags por proyecto.
 Preferir **SSH**:
 
 ```text
-origin  git@github.com:hamsomp3/<repo>.git (fetch)
-origin  git@github.com:hamsomp3/<repo>.git (push)
+origin  git@github.com:<tu-usuario>/<repo>.git (fetch)
+origin  git@github.com:<tu-usuario>/<repo>.git (push)
 ```
 
 ## Buenas prácticas de contexto

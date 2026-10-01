@@ -10,7 +10,6 @@ Ejemplo::
     python3 scripts/new_project.py \\
         --name "Mi Proyecto" \\
         --path ./mi-proyecto \\
-        --owner hamsomp3 \\
         --description "Descripción breve del proyecto." \\
         --git
 
@@ -51,6 +50,21 @@ def slugify(name: str, sep: str = "-") -> str:
     value = re.sub(r"[^a-z0-9]+", sep, value)
     value = re.sub(re.escape(sep) + r"{2,}", sep, value).strip(sep)
     return value or "proyecto"
+
+
+def git_config(key: str) -> str | None:
+    """Lee una clave de ``git config`` (p. ej. ``user.name``). ``None`` si no existe."""
+    try:
+        result = subprocess.run(
+            ["git", "config", "--get", key],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        return None
+    value = result.stdout.strip()
+    return value or None
 
 
 def render(text: str, variables: dict[str, str], flags: dict[str, bool], missing: set[str]) -> str:
@@ -220,18 +234,24 @@ def build_variables(args: argparse.Namespace) -> dict[str, str]:
     if args.repo:
         slug = slugify(args.repo)
     today = dt.date.today()
-    repo_url = f"https://github.com/{args.owner}/{slug}"
+
+    # Identidad derivada del entorno del desarrollador (no del autor de la skill).
+    owner = args.owner or git_config("github.user") or "<usuario>"
+    author = args.author or git_config("user.name") or "<Tu Nombre>"
+    email = args.email or git_config("user.email") or "<tu-correo>"
+
+    repo_url = f"https://github.com/{owner}/{slug}"
     return {
         "PROJECT_NAME": project_name,
         "PROJECT_SLUG": slug,
         "PACKAGE_NAME": package,
         "DESCRIPTION": args.description or f"{project_name}.",
-        "OWNER": args.owner,
+        "OWNER": owner,
         "REPO": slug,
         "REPO_URL": repo_url,
-        "SSH_URL": f"git@{'github.com'}:{args.owner}/{slug}.git",
-        "AUTHOR": args.author,
-        "AUTHOR_EMAIL": args.email,
+        "SSH_URL": f"git@{'github.com'}:{owner}/{slug}.git",
+        "AUTHOR": author,
+        "AUTHOR_EMAIL": email,
         "PYTHON_VERSION": args.python_version,
         "PYTHON_VERSION_NO_DOT": args.python_version.replace(".", ""),
         "YEAR": str(today.year),
@@ -247,13 +267,22 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--name", required=True, help="Nombre legible del proyecto.")
     parser.add_argument("--path", default=".", help="Carpeta destino (por defecto: '.').")
     parser.add_argument("--repo", help="Nombre del repo en GitHub (por defecto: slug del nombre).")
-    parser.add_argument("--owner", default="hamsomp3", help="Cuenta/organización de GitHub.")
+    parser.add_argument(
+        "--owner",
+        help="Cuenta/organización de GitHub (por defecto: 'git config github.user' o '<usuario>').",
+    )
     parser.add_argument(
         "--package", help="Nombre del paquete Python (por defecto: snake_case del nombre)."
     )
     parser.add_argument("--description", help="Descripción de una línea del proyecto.")
-    parser.add_argument("--author", default="Jan Polanco V.", help="Autoría.")
-    parser.add_argument("--email", default="hamsomp3@gmail.com", help="Correo de autoría.")
+    parser.add_argument(
+        "--author",
+        help="Autoría (por defecto: 'git config user.name' o '<Tu Nombre>').",
+    )
+    parser.add_argument(
+        "--email",
+        help="Correo de autoría (por defecto: 'git config user.email' o '<tu-correo>').",
+    )
     parser.add_argument(
         "--python-version", default="3.13", help="Versión de Python (por defecto: 3.13)."
     )

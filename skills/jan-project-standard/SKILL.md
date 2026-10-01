@@ -75,10 +75,13 @@ solo la biblioteca estándar de Python (no requiere `uv` para ejecutarse):
 python3 <SKILL_DIR>/scripts/new_project.py \
   --name "Nombre del Proyecto" \
   --path ./nombre-del-proyecto \
-  --owner hamsomp3 \
   --description "Descripción breve del proyecto." \
   --git
 ```
+
+> La autoría y el owner se **deducen solos**: `--author`/`--email` salen de
+> `git config user.name` / `user.email`, y `--owner` de `git config github.user`. Puedes
+> sobreescribirlos con flags si quieres.
 
 Opciones más usadas:
 
@@ -87,9 +90,9 @@ Opciones más usadas:
 | `--name` | Nombre legible del proyecto (obligatorio). |
 | `--path` | Carpeta destino (por defecto `.`). |
 | `--repo` | Nombre del repo en GitHub (por defecto, slug del nombre). |
-| `--owner` | Cuenta/organización de GitHub (por defecto `hamsomp3`). |
+| `--owner` | Cuenta/organización de GitHub (por defecto: `git config github.user` o `<usuario>`). |
 | `--description` | Descripción de una línea (va al README, pyproject y constitución). |
-| `--author` / `--email` | Autoría (por defecto `Jan Polanco V.` / `hamsomp3@gmail.com`). |
+| `--author` / `--email` | Autoría (por defecto: `git config user.name` / `user.email`). |
 | `--python-version` | Versión de Python (por defecto `3.13`). |
 | `--app` | Proyecto de aplicación (sin paquete ni build-system), en vez de src-layout. |
 | `--minimal` | Solo lo esencial: sin `.github`, sin `AGENTS.md`/`.opencode`, sin extras. |
@@ -130,9 +133,9 @@ make check     # lint + formato + pruebas
 Crea el repositorio (si no existe) y publica:
 
 ```bash
-gh repo create hamsomp3/<repo> --private --source=. --remote=origin --push
+gh repo create <tu-usuario>/<repo> --private --source=. --remote=origin --push
 # o, si el repo ya existe:
-git remote add origin git@github.com:hamsomp3/<repo>.git
+git remote add origin git@github.com:<tu-usuario>/<repo>.git
 git push -u origin main
 ```
 
@@ -251,9 +254,12 @@ un correo y una llave SSH. Es una de las piezas más útiles del estándar: elim
 `gh auth` por proyecto. **Hay dos perfiles** y el agente debe decidir cuál aplica
 (detalle en [`references/git-identity.md`](references/git-identity.md)).
 
-### Perfil A — Soy Jan (dueño de esta skill)
+### Perfil A — Ejemplo (configuración del autor de la skill)
 
-Carpeta canónica `~/Desktop/Repositorios/personal/`:
+> Es solo un **ejemplo real** de un perfil funcionando. Cualquier otro usuario sigue el
+> **Perfil B** con sus propios datos.
+
+Carpeta canónica de ejemplo `~/Desktop/Repositorios/personal/`:
 
 ```ini
 # ~/.gitconfig
@@ -270,15 +276,15 @@ Carpeta canónica `~/Desktop/Repositorios/personal/`:
     sshCommand = ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes
 ```
 
-**Efecto:** todo repo bajo esa carpeta usa el nombre, correo y llave correctos. Preferir
-remotos **SSH** (`git@github.com:hamsomp3/<repo>.git`); HTTPS puede resolver con un token
+**Efecto:** todo repo bajo esa carpeta usa el nombre, correo y llave del ejemplo. Preferir
+remotos **SSH** (`git@github.com:<tu-usuario>/<repo>.git`); HTTPS puede resolver con un token
 de otra cuenta.
 
-### Perfil B — NO soy Jan (alumno, compañero, otro usuario)
+### Perfil B — Cualquier otro usuario (alumno, compañero)
 
-Aquí **no** sirve la ruta fija de Jan. Si el usuario pide identidad automática y no es Jan,
-**pregúntale primero** su nombre, correo, llave SSH y carpeta de proyectos, y luego configura
-`includeIf` en **su** carpeta y **su** sistema operativo (macOS o Windows). Script listo:
+Si el usuario pide identidad automática y **no** comparte el perfil de ejemplo, **pregúntale
+primero** su nombre, correo, llave SSH y carpeta de proyectos, y luego configura `includeIf`
+en **su** carpeta y **su** sistema operativo (macOS o Windows). Script listo:
 
 ```bash
 python3 <SKILL_DIR>/scripts/setup_git_identity.py \
