@@ -52,7 +52,8 @@ make check     # lint + formato + pruebas
 make lint      # Ruff (lint)
 make format    # Ruff (formato)
 make test      # pytest
-```
+{{#if SCIML}}make notebooks # kernel de Jupyter del proyecto
+{{/if}}```
 
 > ⚠️ **Regla dura:** toda gestión de dependencias y entornos pasa por `uv`. Está
 > **prohibido** `pip` y `requirements.txt`.
@@ -84,6 +85,9 @@ En OpenCode la preferencia se aplica automáticamente mediante la regla
 {{/if}}{{#unless PACKAGE}}- `main.py` — punto de entrada de la aplicación.
 {{/unless}}- `tests/` — pruebas con `pytest` (patrón AAA).
 - `docs/` — documentación, ADRs y notas de investigación.
-- `CONSTITUTION.md` — fuente única de verdad.
+{{#if SCIML}}- `notebooks/` — exploración; importan desde el paquete, salidas limpiadas por `nbstripout`.
+- `data/` — datos locales (raw/processed fuera de Git); fuentes documentadas en `data/README.md`.
+- `figures/` — figuras finales generadas por código (nunca a mano).
+{{/if}}- `CONSTITUTION.md` — fuente única de verdad.
 - Estilo impuesto por **Ruff** (`line-length = 100`, comillas dobles).
 - Idioma: UI, comentarios y commits en español; identificadores en inglés.

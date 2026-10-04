@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Scaffolder del estándar de proyectos de Jan Polanco Velasco.
+"""Scaffolder del estándar proyecto-abel (fork de jan-project-standard, de Jan Polanco Velasco).
 
-Genera un proyecto conforme al skill ``jan-project-standard`` copiando las
+Genera un proyecto conforme al skill ``proyecto-abel`` copiando las
 plantillas de ``assets/templates`` y sustituyendo sus marcadores. Usa solo la
 biblioteca estándar de Python, por lo que no requiere ``uv`` para ejecutarse.
 
@@ -36,13 +36,19 @@ TREES: list[tuple[str, str]] = [
     ("base", "."),
     ("github", ".github"),
     ("agents", "."),
+    ("sciml", "."),
 ]
 
 # Marcadores de bloque condicional reconocidos.
-FLAGS = ("PACKAGE", "TYPES", "GITHUB", "AGENTS", "ARCHIFY")
+FLAGS = ("PACKAGE", "TYPES", "GITHUB", "AGENTS", "ARCHIFY", "SCIML")
 
-IF_RE = re.compile(r"\{\{#if\s+([A-Z_]+)\}\}(.*?)\{\{/if\}\}", re.DOTALL)
-UNLESS_RE = re.compile(r"\{\{#unless\s+([A-Z_]+)\}\}(.*?)\{\{/unless\}\}", re.DOTALL)
+# Fix (proyecto-abel): the body may NOT contain another opening tag, so the regex always
+# resolves the innermost block first. The original non-greedy ``(.*?)`` paired an outer
+# ``{{#if}}`` with the first inner ``{{/if}}`` and silently ate content.
+_BODY = r"((?:(?!\{\{#(?:if|unless)\s).)*?)"
+IF_RE = re.compile(r"\{\{#if\s+([A-Z_]+)\}\}" + _BODY + r"\{\{/if\}\}", re.DOTALL)
+UNLESS_RE = re.compile(r"\{\{#unless\s+([A-Z_]+)\}\}" + _BODY + r"\{\{/unless\}\}", re.DOTALL)
+LEFTOVER_RE = re.compile(r"\{\{[#/](?:if|unless)\b")
 VAR_RE = re.compile(r"\{\{([A-Z_][A-Z0-9_]*)\}\}")
 
 
@@ -84,7 +90,14 @@ def render(text: str, variables: dict[str, str], flags: dict[str, bool], missing
         missing.add(key)
         return match.group(0)
 
-    return VAR_RE.sub(_sub, text)
+    text = VAR_RE.sub(_sub, text)
+    if LEFTOVER_RE.search(text):
+        missing.add("<bloque condicional sin cerrar / unclosed conditional block>")
+    # Fix (proyecto-abel): conditional blocks at the end of a file used to leave extra blank
+    # lines, which made pre-commit's end-of-file-fixer fail on a freshly generated project.
+    if text.endswith("\n"):
+        text = text.rstrip("\n") + "\n"
+    return text
 
 
 def write_text(target: Path, content: str, force: bool, dry_run: bool) -> str:
@@ -112,6 +125,8 @@ def copy_templates(
         if source_name == "github" and not flags["GITHUB"]:
             continue
         if source_name == "agents" and not flags["AGENTS"]:
+            continue
+        if source_name == "sciml" and not flags["SCIML"]:
             continue
 
         source_root = TEMPLATES_DIR / source_name
@@ -161,6 +176,8 @@ def audit_project(
         if source_name == "github" and not flags["GITHUB"]:
             continue
         if source_name == "agents" and not flags["AGENTS"]:
+            continue
+        if source_name == "sciml" and not flags["SCIML"]:
             continue
         source_root = TEMPLATES_DIR / source_name
         if not source_root.is_dir():
@@ -315,8 +332,11 @@ def build_variables(args: argparse.Namespace) -> dict[str, str]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Genera un proyecto conforme al estándar jan-project-standard.",
+        description="Genera un proyecto conforme al estándar proyecto-abel.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
+        # Fix (proyecto-abel): with abbreviations on, the documented '--no-git' was silently
+        # read as '--no-github' and dropped the whole .github/ folder.
+        allow_abbrev=False,
     )
     parser.add_argument("--name", help="Nombre legible del proyecto (salvo en modo --audit).")
     parser.add_argument("--path", default=".", help="Carpeta destino (por defecto: '.').")
@@ -352,16 +372,30 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--minimal",
         action="store_true",
-        help="Solo lo esencial (equivale a --no-github --no-agents).",
+        help="Solo lo esencial (equivale a --no-github --no-agents --no-sciml).",
     )
     parser.add_argument(
         "--archify",
         action="store_true",
         help="Incluye la sección de arquitectura (Archify) en el README.",
     )
-
     parser.add_argument(
-        "--git", action="store_true", help="Inicializa el repositorio git (rama main)."
+        "--sciml",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Estructura de investigación SciML: notebooks/, data/, figures/, nbstripout "
+            "(por defecto: sí; --no-sciml la omite)."
+        ),
+    )
+
+    # Fix (proyecto-abel): the docs promised git init by default and a '--no-git' flag, but
+    # '--git' was store_true (default off) and '--no-git' did not exist.
+    parser.add_argument(
+        "--git",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Inicializa el repositorio git en la rama main (por defecto: sí; --no-git lo omite).",
     )
     parser.add_argument(
         "--sync", action="store_true", help="Ejecuta 'uv sync' y 'uv run pre-commit install'."
@@ -453,6 +487,7 @@ def infer_audit_context(target_root: Path, args: argparse.Namespace) -> dict[str
         "AGENTS": (target_root / "AGENTS.md").exists(),
         "ARCHIFY": ("archify" in readme_text)
         or (target_root / "docs" / "arquitectura.html").exists(),
+        "SCIML": (target_root / "notebooks").is_dir(),
     }
 
 
@@ -497,6 +532,7 @@ def main() -> int:
     if args.minimal:
         args.no_github = True
         args.no_agents = True
+        args.sciml = False
 
     flags = {
         "PACKAGE": not args.app,
@@ -504,6 +540,7 @@ def main() -> int:
         "GITHUB": not args.no_github,
         "AGENTS": not args.no_agents,
         "ARCHIFY": args.archify,
+        "SCIML": args.sciml,
     }
 
     target_root = Path(args.path).expanduser().resolve()
@@ -531,6 +568,8 @@ def main() -> int:
         f" · github={'sí' if flags['GITHUB'] else 'no'}"
         f" · agents={'sí' if flags['AGENTS'] else 'no'}"
         f" · archify={'sí' if flags['ARCHIFY'] else 'no'}"
+        f" · sciml={'sí' if flags['SCIML'] else 'no'}"
+        f" · git={'sí' if args.git else 'no'}"
     )
     if args.dry_run:
         print("  (dry-run: no se escribirá nada)")
@@ -544,7 +583,7 @@ def main() -> int:
     copy_templates(target_root, variables, flags, args.force, args.dry_run, missing, stats)
     create_package(target_root, variables, flags, args.force, args.dry_run, stats)
 
-    if args.git:
+    if args.git and not (target_root / ".git").exists():
         run_git(target_root, args.dry_run)
     if args.sync:
         run_sync(target_root, args.dry_run)
@@ -564,7 +603,7 @@ def main() -> int:
     if flags["ARCHIFY"]:
         print("  3. Arquitectura: npx skills add tt-a1i/archify -g  (ver references/archify.md)")
         print("     y genera docs/arquitectura.json + docs/arquitectura.html.")
-        print("  4. cd <path> && uv sync && uv run pre-commit install")
+        print(f"  4. cd {args.path} && uv sync && uv run pre-commit install")
         print("  5. make check")
         print(f"  6. git remote add origin {variables['SSH_URL']} && git push -u origin main")
     else:

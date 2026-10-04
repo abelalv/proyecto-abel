@@ -5,8 +5,8 @@ Cómo se crea, conecta, protege y presenta un repositorio del estándar.
 ## Creación y conexión
 
 La cuenta es **tu usuario de GitHub** (`<tu-usuario>`) y la autenticación preferida es **SSH** con
-`~/.ssh/id_ed25519` (la identidad se resuelve sola dentro de
-`~/Desktop/Repositorios/personal/`; ver `references/agent-context.md`).
+`~/.ssh/id_ed25519` (la identidad se resuelve sola dentro de tu carpeta de repositorios
+configurada con `includeIf`; ver `references/git-identity.md`).
 
 ```bash
 # Opción 1 — repo nuevo, ya conectado y con push inicial

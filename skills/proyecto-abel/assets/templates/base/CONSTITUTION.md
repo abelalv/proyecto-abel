@@ -119,8 +119,8 @@
 - **Estrategia de ramas:** `feat/...`, `fix/...`, `docs/...`, `refactor/...`, `test/...`, `chore/...`; integración vía Pull Request.
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) —
   `feat:`, `fix:`, `docs:`, `refactor:`, `style:`, `test:`, `chore:`.
-- **Identidad git:** se resuelve sola dentro de `~/Desktop/Repositorios/personal/`
-  (ver §11).
+- **Identidad git:** se resuelve sola dentro de la carpeta de repositorios configurada con
+  `includeIf` (ver §11).
 
 ## 8. Flujo diario (commit + push)
 
@@ -177,4 +177,4 @@ Dentro de la carpeta de proyectos, `~/.gitconfig` aplica:
 ```
 
 > Ajusta la carpeta y tus datos. Guía completa (macOS/Windows) en el skill
-> `jan-project-standard` → `references/git-identity.md`.
+> `proyecto-abel` → `references/git-identity.md`.

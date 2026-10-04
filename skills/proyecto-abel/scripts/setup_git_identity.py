@@ -5,8 +5,8 @@ Escribe (o solo imprime) un perfil de identidad y lo enlaza desde ``~/.gitconfig
 para que todo repositorio bajo una carpeta use automáticamente un nombre, un
 correo y una llave SSH concretos.
 
-Pensado para el **Perfil B** del skill ``jan-project-standard``: usuarios que
-**no** son Jan y necesitan su propia identidad (alumnos, compañeros, etc.).
+Pensado para el **Perfil B** del skill ``proyecto-abel``: usuarios que
+no comparten el perfil A y necesitan su propia identidad (alumnos, compañeros, etc.).
 
 Ejemplos::
 
@@ -110,6 +110,7 @@ def maybe_keygen(key: str | None, email: str, enabled: bool) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Configura la identidad Git automática vía includeIf.",
+        allow_abbrev=False,  # Fix (proyecto-abel): avoid silent prefix matching of flags.
     )
     parser.add_argument("--name", required=True, help="Nombre completo para los commits.")
     parser.add_argument("--email", required=True, help="Correo para los commits.")

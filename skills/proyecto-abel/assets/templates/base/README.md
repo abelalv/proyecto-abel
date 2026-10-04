@@ -117,7 +117,7 @@ Mapa de arquitectura interactivo (autocontenido, generado con [Archify](https://
 > `node bin/archify.mjs deliver architecture docs/arquitectura.json docs/arquitectura.html --quality showcase`.
 > El JSON es la fuente versionada; el HTML no se edita a mano.
 
-## 📂 Estructura del repositorio
+{{/if}}## 📂 Estructura del repositorio
 
 ```text
 {{PROJECT_SLUG}}/
@@ -125,7 +125,10 @@ Mapa de arquitectura interactivo (autocontenido, generado con [Archify](https://
 {{/if}}{{#unless PACKAGE}}├── main.py                  # punto de entrada
 {{/unless}}├── tests/                   # pruebas
 ├── docs/                    # documentación
-├── CONSTITUTION.md          # verdad central del proyecto
+{{#if SCIML}}├── notebooks/               # exploración (salidas limpiadas con nbstripout)
+├── data/                    # datos locales (raw/processed no se versionan)
+├── figures/                 # figuras para el paper
+{{/if}}├── CONSTITUTION.md          # verdad central del proyecto
 ├── README.md                # este archivo
 ├── CONTRIBUTING.md          # guía de contribución
 ├── Makefile                 # automatización de tareas

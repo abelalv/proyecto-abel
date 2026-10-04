@@ -34,7 +34,11 @@ dev = [
     "ruff>=0.6",
 {{#if TYPES}}    "ty>=0.0.1",
 {{/if}}]
-
+{{#if SCIML}}notebooks = [
+    "ipykernel>=6.29",
+    "nbstripout>=0.7",
+]
+{{/if}}
 [tool.ruff]
 line-length = 100
 target-version = "py{{PYTHON_VERSION_NO_DOT}}"

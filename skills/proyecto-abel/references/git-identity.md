@@ -13,15 +13,15 @@ flags manuales—. Se implementa con `includeIf` en `~/.gitconfig`.
 
 ---
 
-## Perfil A — Ejemplo: configuración del autor de la skill
+## Perfil A — Abel (autor del fork, Ubuntu 24.04)
 
-> Es solo un **ejemplo real** de cómo se ve un perfil funcionando. Cualquier otro usuario
-> debe seguir el **Perfil B** con sus propios datos.
+> Completa los valores entre `< >` y confirma la carpeta antes de aplicar. Si el usuario no
+> es Abel, usa el **Perfil B**.
 
-La carpeta canónica del autor es `~/Desktop/Repositorios/personal/`. `~/.gitconfig` incluye:
+`~/.gitconfig`:
 
 ```ini
-[includeIf "gitdir:~/Desktop/Repositorios/personal/"]
+[includeIf "gitdir:~/<carpeta-de-repos>/"]
     path = ~/.gitconfig-personal
 ```
 
@@ -29,30 +29,28 @@ La carpeta canónica del autor es `~/Desktop/Repositorios/personal/`. `~/.gitcon
 
 ```ini
 [user]
-    name = Jan Polanco V.
-    email = hamsomp3@gmail.com
+    name = Abel Alvarez Bustos
+    email = <correo-de-github>
 [core]
     sshCommand = ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes
 ```
 
-**Efecto:** todo repo bajo esa carpeta usa automáticamente `Jan Polanco V.`,
-`hamsomp3@gmail.com` y la llave `~/.ssh/id_ed25519`. Preferir remotos **SSH**
-(`git@github.com:hamsomp3/<repo>.git`); HTTPS puede resolver con el token de otra cuenta.
-
 Verificación:
 
 ```bash
-cd ~/Desktop/Repositorios/personal
-git config --show-origin --get user.email   # -> hamsomp3@gmail.com (desde ~/.gitconfig-personal)
-ssh -T git@github.com                        # -> Hi hamsomp3!
+cd ~/<carpeta-de-repos>
+git config --show-origin --get user.email   # -> <correo> (desde ~/.gitconfig-personal)
+ssh -T git@github.com                        # -> Hi <usuario>!
 ```
+
+> Crédito: la configuración original de ejemplo (Perfil A de Jan Polanco Velasco) está en
+> el repositorio upstream `hamsomp3/jan_skills_repository`.
 
 ---
 
-## Perfil B — NO soy Jan (alumno, compañero, otro usuario)
+## Perfil B — Otro usuario (alumno, coautor, compañero)
 
-Cuando el usuario **no es Jan**, no tiene sentido reutilizar la ruta fija
-`~/Desktop/Repositorios/personal/`. Hay que configurar **su** identidad en **su** carpeta
+Cuando el usuario **no es Abel**, no tiene sentido reutilizar la carpeta del Perfil A. Hay que configurar **su** identidad en **su** carpeta
 de proyectos, en **su** sistema operativo.
 
 ### Paso 0 · Preguntar al usuario (obligatorio)

@@ -1,19 +1,27 @@
 ---
-name: jan-project-standard
-description: "Estandariza proyectos personales y académicos con las convenciones de Jan Polanco Velasco: Python con uv/Astral (3.13+), src-layout, Ruff, pre-commit, Makefile, pytest, CONSTITUTION.md como fuente única de verdad, Conventional Commits, README con badges, licencia MIT, gobernanza GitHub (PR/issue templates, CI, Dependabot, labels), contexto para agentes (AGENTS.md, .opencode/, tgrep), identidad Git automática (includeIf; perfil Jan o perfil propio en macOS/Windows) y diagramas de arquitectura con Archify. Úsala al crear o estandarizar un repo, redactar un CONSTITUTION.md, configurar uv/Ruff/pre-commit/CI, añadir un Makefile o README, configurar la identidad Git automática, generar un diagrama con Archify, o conectar el proyecto a GitHub. Use when scaffolding a Python repository, writing a CONSTITUTION.md, setting up uv, Ruff, pre-commit or CI, configuring automatic Git identity, generating an Archify diagram, or standardizing a project."
+name: proyecto-abel
+description: "Bilingual (EN/ES) project standard for Abel Alvarez Bustos's research and teaching repos (SciML, PINNs, GNNs, remote sensing): Python with uv/Astral, src-layout, Ruff, pre-commit, pytest, Makefile, CONSTITUTION.md as single source of truth, notebooks/ + data/ + figures/ with nbstripout, Google Colab conventions, CLAUDE.md + AGENTS.md, GitHub governance, automatic Git identity (includeIf) and optional Archify diagrams. Fork of jan-project-standard with bug fixes. Use when scaffolding, auditing or standardizing a Python research repository, writing a CONSTITUTION.md, setting up uv/Ruff/pre-commit/CI, or preparing reproducible code for a paper. Úsala al crear, auditar o estandarizar un repositorio de investigación o de curso, redactar un CONSTITUTION.md, configurar uv/Ruff/pre-commit/CI o preparar código reproducible para un artículo."
 license: MIT
-compatibility: Requiere Python 3 (el scaffolder usa solo la biblioteca estándar). Para aplicar el estándar al proyecto destino se recomienda uv, git y, opcionalmente, gh.
+compatibility: Requires Python 3.11+ to run the scaffolder (standard library only). uv, git and optionally gh are recommended for the generated project.
 metadata:
-  author: Jan Polanco Velasco
-  version: "1.0"
-  homepage: https://github.com/hamsomp3/jan_skills_repository
+  author: Abel Alvarez Bustos
+  based-on: jan-project-standard by Jan Polanco Velasco (MIT)
+  version: "1.1.0"
 ---
 
-# Estándar de proyectos — Jan Polanco Velasco
+# proyecto-abel — Estándar de proyectos de investigación / Research project standard
 
-Este skill encapsula **cómo se construyen y gobiernan los proyectos** de Jan: una forma
-de trabajar repetible, reproducible y auditable que ya está aplicada en decenas de
-repositorios personales y académicos.
+> **EN** — This skill encodes how Abel's research and course repositories are built and
+> governed: repeatable, reproducible and auditable. It is a fork of
+> [`jan-project-standard`](https://github.com/hamsomp3/jan_skills_repository) (Jan Polanco
+> Velasco, MIT) with bug fixes and a Scientific ML layer (notebooks, data, figures, Colab).
+> The agent should answer the user in the language they write in; generated project files
+> are in Spanish.
+>
+> **ES** — Este skill encapsula cómo se construyen y gobiernan los repositorios de
+> investigación y de curso de Abel. Es un fork de `jan-project-standard` con correcciones
+> y una capa de ML científico. Diagrama del flujo de trabajo: `docs/workflow.md` en la raíz
+> del repositorio del skill.
 
 > **Filosofía central:** todo lo que vive dentro de la carpeta del proyecto tiene una
 > instrucción escrita. El documento que la contiene es **`CONSTITUTION.md`**, la
@@ -30,10 +38,10 @@ piezas que conviene incluir:
 ```text
 @jan-project-standard
 
-Soy:         Jan  |  NO soy Jan → aquí mi nombre y correo
+Soy:         Abel  |  NO soy Abel (alumno, coautor) → aquí mi nombre y correo
 Estado:      proyecto nuevo  |  proyecto existente (ya tiene README y/o CONSTITUTION.md)
 Repo:        git@github.com:<usuario>/<repo>.git
-Stack:       Python (uv) · ¿paquete o app? · ¿ty? · ¿Archify?
+Stack:       Python (uv) · ¿paquete o app? · ¿ty? · ¿SciML (notebooks/data)? · ¿Archify?
 Objetivo:    crear desde cero  |  estandarizar SIN borrar  |  solo auditar  |  añadir X
 Restricción: no elimines nada existente; mejora y completa.
 ```
@@ -42,7 +50,7 @@ Restricción: no elimines nada existente; mejora y completa.
 
 - En un proyecto existente: **primero leer, luego proponer, luego aplicar**. Nunca reemplaces
   archivos del usuario (README, `CONSTITUTION.md`, código) sin revisarlos.
-- Si **no eres Jan**: no uses rutas ni repos fijos; aporta tus datos (ver "Identidad Git").
+- Si el usuario **no es Abel**: no uses rutas ni repos fijos; aporta tus datos (ver "Identidad Git").
 - Ante la duda, **audita** (`--audit`) y muestra el informe antes de tocar nada.
 
 ---
@@ -83,9 +91,8 @@ Restricción: no elimines nada existente; mejora y completa.
 9. **README profesional:** badges, tabla de contenidos, stack, primeros pasos, estructura,
    arquitectura (opcional, con **Archify**), contribución y licencia.
 10. **Identidad Git automática:** la carpeta de proyectos hereda nombre, correo y llave SSH
-    vía `includeIf` en `~/.gitconfig`. **Perfil A** para Jan
-    (`~/Desktop/Repositorios/personal/`); **Perfil B** para cualquier otro usuario (macOS o
-    Windows), y **solo si lo pide** (ver [`references/git-identity.md`](references/git-identity.md)).
+    vía `includeIf` en `~/.gitconfig`. **Perfil A** para Abel (Ubuntu); **Perfil B** para
+    cualquier otro usuario (Linux, macOS o Windows), y **solo si lo pide** (ver [`references/git-identity.md`](references/git-identity.md)).
 
 ---
 
@@ -120,12 +127,13 @@ Opciones más usadas:
 | `--author` / `--email` | Autoría (por defecto: `git config user.name` / `user.email`). |
 | `--python-version` | Versión de Python (por defecto `3.13`). |
 | `--app` | Proyecto de aplicación (sin paquete ni build-system), en vez de src-layout. |
-| `--minimal` | Solo lo esencial: sin `.github`, sin `AGENTS.md`/`.opencode`, sin extras. |
+| `--minimal` | Solo lo esencial: sin `.github`, sin `AGENTS.md`/`CLAUDE.md`/`.opencode`, sin capa SciML. Ideal para un repo de paper individual. |
+| `--sciml` / `--no-sciml` | Capa de investigación: `notebooks/`, `data/`, `figures/`, `nbstripout`, grupo `notebooks` y `make notebooks`. Por defecto: **sí**. |
 | `--archify` | Incluye la sección **Arquitectura del proyecto** (Archify) en el README y la fila en la constitución. |
 | `--no-types` | Omite `ty` (tipado estático) de dependencias, Makefile y docs. |
 | `--no-github` | No genera `.github/`. |
-| `--no-agents` | No genera `AGENTS.md` ni `.opencode/`. |
-| `--git` / `--no-git` | Inicializa el repositorio git (rama `main`). Por defecto: sí. |
+| `--no-agents` | No genera `AGENTS.md`, `CLAUDE.md` ni `.opencode/`. |
+| `--git` / `--no-git` | Inicializa el repositorio git (rama `main`). Por defecto: sí (corregido en este fork). |
 | `--sync` | Ejecuta `uv sync` y `uv run pre-commit install` al terminar. |
 | `--force` | Sobrescribe archivos existentes. |
 | `--dry-run` | Muestra qué haría sin escribir nada. |
@@ -233,6 +241,10 @@ se regenera con `deliver`. Detalle completo en [`references/archify.md`](referen
 | `CONTRIBUTING.md` | Entorno, ramas, estándares, commits y proceso de PR. |
 | `CODE_OF_CONDUCT.md` | Contributor Covenant 2.1 (proyectos con colaboración). |
 | `AGENTS.md` | Contexto para agentes LLM (stack, flujo, reglas, tgrep). |
+| `CLAUDE.md` | Importa `AGENTS.md` (`@AGENTS.md`) y añade reglas para Claude Code (semillas, unidades, no tocar datos). |
+| `notebooks/` | Exploración; salidas limpiadas por `nbstripout`; instrucciones de Colab (modo SciML). |
+| `data/` | Datos locales fuera de Git; tabla de fuentes para reproducibilidad (modo SciML). |
+| `figures/` | Figuras finales para artículos, generadas por código (modo SciML). |
 | `.opencode/rules/tgrep.md` | Regla de búsqueda con `tgrep` para agentes en OpenCode. |
 | `.github/pull_request_template.md` | Plantilla de PR (Conventional Commits + checklist). |
 | `.github/ISSUE_TEMPLATE/` | Formularios de bug, funcionalidad e investigación (spike). |
@@ -266,7 +278,9 @@ Si editas a mano, reemplázalos todos:
 
 Bloques condicionales (se eliminan si la bandera es falsa):
 `{{#if PACKAGE}}…{{/if}}` (src-layout), `{{#if TYPES}}…{{/if}}` (`ty`),
-`{{#if GITHUB}}…{{/if}}`, `{{#if AGENTS}}…{{/if}}`.
+`{{#if GITHUB}}…{{/if}}`, `{{#if AGENTS}}…{{/if}}`, `{{#if SCIML}}…{{/if}}`,
+`{{#if ARCHIFY}}…{{/if}}`, y `{{#unless X}}…{{/unless}}`. Los bloques pueden anidarse: el
+renderizador resuelve primero el más interno y avisa si queda un bloque sin cerrar.
 
 ---
 
@@ -280,8 +294,9 @@ Carga estos archivos **solo cuando los necesites** (divulgación progresiva):
 | [`references/python-stack.md`](references/python-stack.md) | `uv`, `pyproject.toml`, Ruff, Makefile, pre-commit, `.editorconfig`, `.gitignore`. |
 | [`references/github.md`](references/github.md) | Creación del repo, remotos SSH, badges, plantillas, CI, Dependabot, labels, ramas. |
 | [`references/agent-context.md`](references/agent-context.md) | `AGENTS.md`, `.opencode/rules/` y tgrep. |
-| [`references/git-identity.md`](references/git-identity.md) | Identidad Git automática (`includeIf`): perfil Jan y perfil propio para macOS/Windows. |
+| [`references/git-identity.md`](references/git-identity.md) | Identidad Git automática (`includeIf`): perfil A (Abel) y perfil B (otros usuarios: Linux, macOS, Windows). |
 | [`references/archify.md`](references/archify.md) | Diagramas de arquitectura interactivos con Archify (instalación, tipos, validate/deliver, README). |
+| [`references/colab.md`](references/colab.md) | Google Colab y GPU: instalar el paquete sin romper torch/jax, versión de Python, semillas. |
 | [`references/slidev.md`](references/slidev.md) | Presentaciones con Slidev (proyectos de curso): monolito, hub, reglas de sintaxis, export. |
 
 ---
@@ -293,37 +308,37 @@ un correo y una llave SSH. Es una de las piezas más útiles del estándar: elim
 `gh auth` por proyecto. **Hay dos perfiles** y el agente debe decidir cuál aplica
 (detalle en [`references/git-identity.md`](references/git-identity.md)).
 
-### Perfil A — Ejemplo (configuración del autor de la skill)
+### Perfil A — Abel (Ubuntu 24.04)
 
-> Es solo un **ejemplo real** de un perfil funcionando. Cualquier otro usuario sigue el
-> **Perfil B** con sus propios datos.
-
-Carpeta canónica de ejemplo `~/Desktop/Repositorios/personal/`:
+> Plantilla del autor del fork. **Confirma la carpeta y la llave** antes de aplicarla;
+> los valores entre `< >` deben completarse.
 
 ```ini
 # ~/.gitconfig
-[includeIf "gitdir:~/Desktop/Repositorios/personal/"]
+[includeIf "gitdir:~/<carpeta-de-repos>/"]
     path = ~/.gitconfig-personal
 ```
 
 ```ini
 # ~/.gitconfig-personal
 [user]
-    name = Jan Polanco V.
-    email = hamsomp3@gmail.com
+    name = Abel Alvarez Bustos
+    email = <correo-de-github>
 [core]
     sshCommand = ssh -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes
 ```
 
-**Efecto:** todo repo bajo esa carpeta usa el nombre, correo y llave del ejemplo. Preferir
-remotos **SSH** (`git@github.com:<tu-usuario>/<repo>.git`); HTTPS puede resolver con un token
-de otra cuenta.
+```bash
+# Equivalente con el script (Linux):
+python3 <SKILL_DIR>/scripts/setup_git_identity.py --name "Abel Alvarez Bustos" \
+  --email <correo> --key ~/.ssh/id_ed25519 --dir ~/<carpeta-de-repos> --platform linux --print
+```
 
-### Perfil B — Cualquier otro usuario (alumno, compañero)
+### Perfil B — Cualquier otro usuario (alumno, coautor)
 
 Si el usuario pide identidad automática y **no** comparte el perfil de ejemplo, **pregúntale
 primero** su nombre, correo, llave SSH y carpeta de proyectos, y luego configura `includeIf`
-en **su** carpeta y **su** sistema operativo (macOS o Windows). Script listo:
+en **su** carpeta y **su** sistema operativo (Linux, macOS o Windows). Script listo:
 
 ```bash
 python3 <SKILL_DIR>/scripts/setup_git_identity.py \
@@ -365,7 +380,8 @@ Antes de dar por terminado un proyecto o un cambio:
 - [ ] `LICENSE` presente (MIT por defecto).
 - [ ] `.github/` con PR template, issue templates, CI, Dependabot y labels (si aplica).
 - [ ] `AGENTS.md` (y `.opencode/rules/tgrep.md`) describen el proyecto para agentes (si aplica).
-- [ ] Identidad Git automática configurada **si el usuario lo pidió** (perfil A para Jan / perfil B para otros).
+- [ ] Identidad Git automática configurada **si el usuario lo pidió** (perfil A para Abel / perfil B para otros).
+- [ ] (SciML) Fuentes de datos documentadas en `data/README.md`; semillas fijadas; figuras regenerables desde código.
 - [ ] Diagrama de arquitectura con Archify en `docs/` y enlazado desde el README (si aplica).
 - [ ] Sin secretos, datos personales ni artefactos pesados versionados.
 - [ ] El historial de decisiones de la constitución registra los cambios significativos.

@@ -1,148 +1,81 @@
-# jan_skills_repository
+# proyecto-abel
 
-[![skills.sh](https://skills.sh/b/hamsomp3/jan_skills_repository)](https://skills.sh/hamsomp3/jan_skills_repository)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-standard-3776AB.svg)](https://agentskills.io)
+[![Fork of](https://img.shields.io/badge/fork%20of-jan__skills__repository-lightgrey.svg)](https://github.com/hamsomp3/jan_skills_repository)
 
-Repositorio de **skills** (Agent Skills) de Jan Polanco Velasco. Cada skill vive en su
-propia carpeta bajo [`skills/`](./skills) con un `SKILL.md` (frontmatter YAML + instrucciones),
-siguiendo el [estándar de Agent Skills](https://agentskills.io).
+**EN** — An [Agent Skill](https://agentskills.io) that scaffolds, audits and standardizes
+Python research and teaching repositories: `uv` + Ruff + pre-commit + pytest + Makefile,
+`CONSTITUTION.md` as the single source of truth, a Scientific ML layer (notebooks, data,
+figures, Colab) and agent context for Claude Code. Fork of Jan Polanco Velasco's
+[`jan-project-standard`](https://github.com/hamsomp3/jan_skills_repository) with
+[9 bug fixes](ISSUES.md).
 
-## Skills disponibles
+**ES** — Un skill que crea, audita y estandariza repositorios de investigación y de curso en
+Python, con una capa de ML científico y contexto para Claude Code. Fork de
+`jan-project-standard` con [9 correcciones](ISSUES.md).
 
-| Skill | Descripción |
-|-------|-------------|
-| [`jan-project-standard`](./skills/jan-project-standard/SKILL.md) | Estandariza proyectos personales y académicos: `uv` + Astral, **src-layout**, Ruff, pre-commit, Makefile, `CONSTITUTION.md` como fuente única de verdad, Conventional Commits, README con badges, licencia MIT, gobernanza GitHub (PR/issue templates, CI, Dependabot, labels), contexto para agentes (`AGENTS.md`, `.opencode/`, tgrep), **identidad Git automática** (`includeIf`, perfiles Jan y propio para macOS/Windows) y **diagramas de arquitectura con [Archify](https://github.com/tt-a1i/archify)**. |
+| | |
+|---|---|
+| 📘 Skill | [`skills/proyecto-abel/SKILL.md`](skills/proyecto-abel/SKILL.md) |
+| 🗺️ Workflow / Flujo | [`docs/workflow.md`](docs/workflow.md) (bilingual Mermaid diagrams) |
+| 🐞 Issues / Problemas | [`ISSUES.md`](ISSUES.md) |
+| 📝 Changes / Cambios | [`CHANGELOG.md`](CHANGELOG.md) |
 
-## Instalación
-
-Con el CLI de [skills.sh](https://www.skills.sh):
-
-```bash
-# Instalar en el proyecto actual (se commitea con el repo)
-npx skills add hamsomp3/jan_skills_repository --skill jan-project-standard
-
-# Instalar globalmente (disponible en todos los proyectos)
-npx skills add hamsomp3/jan_skills_repository --skill jan-project-standard -g
-
-# Instalar para agentes concretos
-npx skills add hamsomp3/jan_skills_repository --skill jan-project-standard -a opencode -a claude-code
-
-# Sin prompts (CI-friendly)
-npx skills add hamsomp3/jan_skills_repository --skill jan-project-standard -g -a opencode -y
-```
-
-Para listar las skills del repositorio sin instalar:
+## Install / Instalación
 
 ```bash
-npx skills add hamsomp3/jan_skills_repository --list
+# Claude Code / OpenCode via skills.sh (replace <user> with your GitHub user)
+npx skills add <user>/proyecto-abel --skill proyecto-abel -g
+
+# Or manually for Claude Code / O manualmente
+git clone git@github.com:<user>/proyecto-abel.git
+cp -r proyecto-abel/skills/proyecto-abel ~/.claude/skills/
 ```
 
-> También puedes clonar y usar el script directamente:
-> `python3 skills/jan-project-standard/scripts/new_project.py --help`
+## Quick use / Uso rápido
 
-## Ejemplos de uso (copy-paste)
-
-Invoca la skill en lenguaje natural. Copia cualquiera de estos bloques y ajústalo.
-
-### 1 · Proyecto nuevo (soy Jan)
+Natural language / Lenguaje natural:
 
 ```text
-@jan-project-standard crea un proyecto nuevo.
-Nombre: "Detector de Neumonía" · App con Streamlit · paquete Python.
-Descripción: "Clasificador de radiografías con Grad-CAM."
-Incluye Archify para el diagrama de arquitectura.
+@proyecto-abel create a new research project "PINN Heat Equation",
+package mode, with notebooks, for a Q1 paper.
+
+@proyecto-abel audita este repositorio sin modificar nada y dime qué falta.
+
+@proyecto-abel crea un proyecto mínimo para mis estudiantes de Modelación (--app).
 ```
 
-### 2 · Proyecto existente — estandarizar SIN borrar
-
-```text
-@jan-project-standard este proyecto ya existe y tiene README y CONSTITUTION.md.
-Repositorio remoto: git@github.com:pedro/mi-proyecto.git
-No elimines nada: audítalo, dime qué falta y complétalo.
-Respeta mi README y mi CONSTITUTION.md; solo mejora y añade.
-```
-
-### 3 · NO soy Jan (alumno / compañero)
-
-```text
-@jan-project-standard no soy Jan. Me llamo "Pedro Pérez" (pedro@example.com),
-mi repo es git@github.com:pedro/proyecto.git y ya existe con README.
-Quiero adoptar el estándar: uv, Ruff, pre-commit, Makefile y CONSTITUTION.md.
-No borres nada existente; completa lo que falte.
-```
-
-### 4 · Solo auditar (no toca nada)
-
-```text
-@jan-project-standard audita este proyecto existente y muéstrame el informe
-(FALTA / DIFIERE / OK) sin modificar nada.
-```
-
-### 5 · Añadir arquitectura (Archify)
-
-```text
-@jan-project-standard instala Archify y genera docs/arquitectura.html a partir
-de este repositorio; luego enlázalo en la sección de arquitectura del README.
-```
-
-### 6 · Identidad Git automática (macOS / Windows)
-
-```text
-@jan-project-standard no soy Jan. Configura mi identidad Git automática
-(includeIf): Pedro Pérez <pedro@example.com>, llave ~/.ssh/id_ed25519,
-carpeta ~/Repos. Estoy en macOS.
-```
-
-### 7 · Actualizar la constitución
-
-```text
-@jan-project-standard actualiza CONSTITUTION.md con el nuevo módulo de
-autenticación y registra la decisión en el historial. No borres lo anterior.
-```
-
-### Equivalentes por CLI (sin agente)
+CLI (no agent / sin agente):
 
 ```bash
-D=skills/jan-project-standard/scripts
-
-python3 $D/new_project.py --path . --audit                    # auditar (no escribe)
-python3 $D/new_project.py --path ./nuevo --name "Mi Proyecto" \
-    --description "..." --archify --git                        # crear
-python3 $D/new_project.py --path . --name "Mi Proyecto"        # completar (omite lo existente)
-python3 $D/setup_git_identity.py --name "Pedro Pérez" --email pedro@example.com \
-    --key ~/.ssh/id_ed25519 --dir ~/Repos --platform mac        # identidad Git automática
+S=skills/proyecto-abel/scripts
+python3 $S/new_project.py --name "PINN Heat" --description "..."   # SciML + git by default
+python3 $S/new_project.py --name "Paper X" --minimal --sciml        # single-author paper
+python3 $S/new_project.py --name "Taller 1" --app --no-sciml        # course app
+python3 $S/new_project.py --path . --audit                          # audit only, writes nothing
 ```
 
-> **Regla de oro:** en un proyecto existente, sin `--force` el scaffolder **nunca** sobrescribe
-> archivos; solo crea los que faltan. Los cambios sobre archivos propios se hacen a mano,
-> fusionando.
+> **Golden rule / Regla de oro:** without `--force` the scaffolder never overwrites existing
+> files. / Sin `--force` nunca sobrescribe archivos existentes.
 
-## Estructura
+## Structure / Estructura
 
 ```text
-jan_skills_repository/
-├── README.md
-├── LICENSE
-├── .gitignore
-└── skills/
-    └── jan-project-standard/
-        ├── SKILL.md              # metadata + instrucciones
-        ├── references/           # documentación de apoyo (carga progresiva)
-        ├── scripts/              # scaffolder ejecutable
-        └── assets/templates/     # plantillas de archivos del estándar
+proyecto-abel/
+├── README.md · ISSUES.md · CHANGELOG.md · LICENSE
+├── docs/workflow.md                 # bilingual workflow diagrams
+└── skills/proyecto-abel/
+    ├── SKILL.md                     # metadata + instructions
+    ├── references/                  # loaded on demand (incl. colab.md)
+    ├── scripts/                     # new_project.py, setup_git_identity.py
+    └── assets/templates/            # base · github · agents · sciml
 ```
 
-## Crear una skill nueva
+## Credits / Créditos
 
-1. Crea `skills/<nombre>/SKILL.md` con frontmatter `name` (igual al de la carpeta) y `description`.
-2. Añade `references/`, `scripts/` y `assets/` según lo necesites.
-3. Valida el frontmatter (nombre en minúsculas, sin guiones dobles, ≤ 64 caracteres).
-4. **Entrecomilla los valores con `: `** (dos puntos + espacio). YAML lo interpreta como un
-   mapeo anidado y falla con *mapping values are not allowed in this context*:
-   `description: "Texto: con dos puntos"`. Vale para `description`, `title`, etc.
-5. Añádela a la tabla de **Skills disponibles** de este README.
+Original standard, templates and scripts: **Jan Polanco Velasco**
+([`hamsomp3/jan_skills_repository`](https://github.com/hamsomp3/jan_skills_repository), MIT).
+Fork, fixes and SciML layer: **Abel Alvarez Bustos**, Pontificia Universidad Javeriana Cali.
 
-## Licencia
-
-[MIT](./LICENSE) © 2026 Jan Polanco Velasco
+[MIT](LICENSE)

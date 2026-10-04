@@ -37,7 +37,13 @@ repos:
         args: ["--fix", "--exit-non-zero-on-fix"]
       - id: ruff-format
 
-  # --- uv: mantiene uv.lock sincronizado (Astral) ---
+{{#if SCIML}}  # --- Notebooks: elimina salidas y metadatos antes de commitear (proyecto-abel) ---
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      - id: nbstripout
+
+{{/if}}  # --- uv: mantiene uv.lock sincronizado (Astral) ---
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.12.2
     hooks:

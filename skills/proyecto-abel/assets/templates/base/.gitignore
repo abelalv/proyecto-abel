@@ -35,6 +35,19 @@ artifacts/
 *.sqlite
 *.db
 
+# Investigación / SciML (proyecto-abel)
+.ipynb_checkpoints/
+results/
+checkpoints/
+runs/
+wandb/
+lightning_logs/
+outputs/
+*.npz
+*.nc
+*.tif
+*.tiff
+
 # Sistema operativo / IDE
 .DS_Store
 Thumbs.db

@@ -5,7 +5,7 @@
 SHELL := /bin/bash
 
 .DEFAULT_GOAL := help
-.PHONY: help install dev pre-commit-install pre-commit lint format format-check typecheck test check build clean
+.PHONY: help install dev pre-commit-install pre-commit lint format format-check typecheck test check build notebooks clean
 
 help: ## Muestra esta ayuda
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -41,6 +41,10 @@ format-check: ## Verifica el formato sin modificarlo
 {{/unless}}
 {{#if PACKAGE}}build: ## Construye el paquete (sdist + wheel)
 	uv build
+
+{{/if}}{{#if SCIML}}notebooks: ## Instala el kernel de Jupyter del proyecto (grupo 'notebooks')
+	uv sync --group notebooks
+	uv run python -m ipykernel install --user --name {{PROJECT_SLUG}} --display-name "{{PROJECT_NAME}}"
 
 {{/if}}clean: ## Limpia cachés y artefactos
 	rm -rf .pytest_cache .ruff_cache .mypy_cache dist build htmlcov .coverage
