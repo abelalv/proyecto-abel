@@ -2,7 +2,7 @@
 
 El estándar asume que en el proyecto trabajan agentes (OpenCode, Antigravity, Copilot CLI,
 Claude Code, etc.). Para que no adivinen, el repositorio incluye archivos de contexto
-versionados.
+versionados: `AGENTS.md` (genérico), `CLAUDE.md` (Claude Code) y `.opencode/rules/` (OpenCode).
 
 ## `AGENTS.md`
 
@@ -19,6 +19,13 @@ Contenido recomendado:
 
 > **Regla:** `AGENTS.md` **no duplica** la constitución; la enlaza. Si un dato cambia, se
 > actualiza en la constitución y `AGENTS.md` lo refleja o lo referencia.
+
+## `CLAUDE.md`
+
+Claude Code lee `CLAUDE.md` automáticamente. Para no duplicar contenido, la plantilla
+empieza con `@AGENTS.md` (importa ese archivo) y solo añade reglas específicas:
+`make check` antes de terminar, dependencias solo con `uv`, semillas y unidades en código
+numérico, y no tocar `data/` ni `figures/` sin permiso.
 
 ## Regla OpenCode: `tgrep`
 
@@ -63,7 +70,7 @@ automática en cada sesión.
 
 **Efecto:** los repos bajo esa carpeta usan automáticamente el nombre, el correo y la llave
 SSH correctos. No requiere `gh`, variables de entorno ni flags por proyecto. Configuración y
-perfiles (macOS/Windows) en [`git-identity.md`](git-identity.md).
+perfiles (Linux, macOS, Windows) en [`git-identity.md`](git-identity.md).
 
 > Esto es configuración de la **máquina**, no del repositorio: se documenta en la
 > constitución como nota y **nunca** se versiona un archivo con secretos.

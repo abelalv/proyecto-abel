@@ -8,6 +8,7 @@ formato, tipado, pruebas, hooks y Makefile.
 - **Todo** pasa por [`uv`](https://docs.astral.sh/uv/): crear entorno, instalar,
   ejecutar, bloquear, construir.
 - **Prohibido:** `pip install`, `requirements.txt`, entornos manuales con `venv`.
+  Única excepción: dentro de Google Colab (ver [`colab.md`](colab.md)).
 - Dependencias declaradas en `pyproject.toml`; **`uv.lock` se versiona**.
 - Entorno virtual en `.venv/` (ignorado por Git).
 - Versión de Python fijada en `.python-version` (`3.13`).
@@ -176,6 +177,19 @@ uv run pre-commit install              # una vez por clon
 uv run pre-commit run --all-files      # sobre todo el repo
 ```
 
+### Hook de notebooks (modo SciML)
+
+Con `--sciml` (por defecto) se añade [`nbstripout`](https://github.com/kynan/nbstripout),
+que elimina salidas y metadatos de los `.ipynb` antes de cada commit. Así los diffs son
+legibles y no se versionan imágenes ni datos embebidos. Ruff también analiza los notebooks.
+
+```yaml
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      - id: nbstripout
+```
+
 ## Makefile — interfaz del proyecto
 
 Contrato mínimo de targets (todos documentados con `## ` para `make help`):
@@ -193,6 +207,7 @@ Contrato mínimo de targets (todos documentados con `## ` para `make help`):
 | `check` | lint + format-check + (typecheck) + test. |
 | `pre-commit` | `uv run pre-commit run --all-files`. |
 | `build` | `uv build`. |
+| `notebooks` | `uv sync --group notebooks` + registra el kernel de Jupyter (modo SciML). |
 | `clean` | Limpia cachés y artefactos. |
 
 Usa `SHELL := /bin/bash`, `.DEFAULT_GOAL := help` y `.PHONY`. Las tabulaciones son

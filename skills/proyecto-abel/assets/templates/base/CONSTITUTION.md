@@ -55,12 +55,14 @@
 {{/if}}| **Testing** | [`pytest`](https://docs.pytest.org/) |
 | **Linting / Formato** | [Ruff](https://docs.astral.sh/ruff/) |
 | **Pre-commit** | [pre-commit](https://pre-commit.com) |
-| **CI/CD** | [GitHub Actions](.github/workflows/ci.yml) |
-{{#if ARCHIFY}}| **Diagramas de arquitectura** | [Archify](https://github.com/tt-a1i/archify) (HTML interactivo en `docs/`) |
-{{/if}}| **Dependencias automáticas** | [Dependabot](.github/dependabot.yml) |
-
+{{#if GITHUB}}| **CI/CD** | [GitHub Actions](.github/workflows/ci.yml) |
+{{/if}}{{#if SCIML}}| **Notebooks** | Jupyter (`ipykernel`, grupo `notebooks`) + [`nbstripout`](https://github.com/kynan/nbstripout) |
+{{/if}}{{#if ARCHIFY}}| **Diagramas de arquitectura** | [Archify](https://github.com/tt-a1i/archify) (HTML interactivo en `docs/`) |
+{{/if}}{{#if GITHUB}}| **Dependencias automáticas** | [Dependabot](.github/dependabot.yml) |
+{{/if}}
 > ⚠️ **Regla dura:** toda gestión de dependencias y entornos pasa por `uv`. Está
-> **prohibido** `pip` y `requirements.txt`.
+> **prohibido** `pip` y `requirements.txt`.{{#if SCIML}} Única excepción documentada: dentro de
+> Google Colab se instala el paquete con `pip install -e . --no-deps` (el entorno no es nuestro).{{/if}}
 
 ## 4. Estructura del repositorio
 
@@ -70,10 +72,14 @@
 {{/if}}{{#unless PACKAGE}}├── main.py                  # punto de entrada
 {{/unless}}├── tests/                   # pruebas (pytest)
 ├── docs/                    # documentación, ADRs e investigación
-├── .github/                 # gobernanza (PR/issue templates, CI, Dependabot, labels)
-├── .opencode/rules/         # reglas para agentes (tgrep)
+{{#if SCIML}}├── notebooks/               # exploración (salidas limpiadas con nbstripout)
+├── data/                    # datos locales; raw/processed fuera de Git
+├── figures/                 # figuras finales generadas por código
+{{/if}}{{#if GITHUB}}├── .github/                 # gobernanza (PR/issue templates, CI, Dependabot, labels)
+{{/if}}{{#if AGENTS}}├── .opencode/rules/         # reglas para agentes (tgrep)
 ├── AGENTS.md                # contexto para agentes LLM
-├── CONSTITUTION.md          # este archivo — verdad central
+├── CLAUDE.md                # contexto para Claude Code (importa AGENTS.md)
+{{/if}}├── CONSTITUTION.md          # este archivo — verdad central
 ├── README.md                # puerta de entrada pública
 ├── CONTRIBUTING.md          # guía de contribución
 ├── CODE_OF_CONDUCT.md       # código de conducta
@@ -95,7 +101,14 @@
 - **Pruebas:** `pytest` con el patrón **AAA** (*Arrange · Act · Assert*).
 - **Idioma:** UI, comentarios y commits en español; identificadores de código en inglés.
 - **Reglas propias:**
-  - <!-- Agrega aquí invariantes del dominio (p. ej. "montos como enteros", "cero lógica en la UI"). -->
+  - <!-- Agrega aquí invariantes del dominio (p. ej. "unidades SI en todo el código", "semillas fijas"). -->
+{{#if SCIML}}- **Reproducibilidad (investigación):**
+  - Semillas fijadas y registradas en cada experimento.
+  - Unidades y dimensiones documentadas en los docstrings.
+  - Los notebooks importan desde el paquete; el código reutilizable vive en `src/`.
+  - Toda figura de `figures/` se regenera con un script; nunca se edita a mano.
+  - Fuentes de datos documentadas en `data/README.md`.
+{{/if}}
 
 ## 6. Calidad y automatización
 
@@ -106,11 +119,13 @@
 {{#if TYPES}}| `ty` | Verificación de tipos | `make typecheck` |
 {{/if}}| `pytest` | Pruebas | `make test` |
 | `pre-commit` | Hooks antes de cada commit | `make pre-commit` |
-| GitHub Actions | CI (pre-commit + pruebas) | `.github/workflows/ci.yml` |
-
+{{#if GITHUB}}| GitHub Actions | CI (pre-commit + pruebas) | `.github/workflows/ci.yml` |
+{{/if}}{{#if SCIML}}| `nbstripout` | Limpia salidas de notebooks | automático (pre-commit) |
+{{/if}}
 - Ningún commit se salta los hooks (`--no-verify` está prohibido salvo causa justificada y documentada).
-- La **CI debe estar en verde** antes de fusionar un Pull Request.
-- Toda dependencia nueva entra con `uv add` / `uv add --dev` (nunca editando `uv.lock` a mano).
+{{#if GITHUB}}- La **CI debe estar en verde** antes de fusionar un Pull Request.
+{{/if}}{{#unless GITHUB}}- `make check` debe estar en verde antes de cada push (no hay CI configurada).
+{{/unless}}- Toda dependencia nueva entra con `uv add` / `uv add --dev` (nunca editando `uv.lock` a mano).
 
 ## 7. Repositorio y Git
 

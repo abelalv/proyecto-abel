@@ -1,27 +1,25 @@
 ---
 name: proyecto-abel
-description: "Bilingual (EN/ES) project standard for Abel Alvarez Bustos's research and teaching repos (SciML, PINNs, GNNs, remote sensing): Python with uv/Astral, src-layout, Ruff, pre-commit, pytest, Makefile, CONSTITUTION.md as single source of truth, notebooks/ + data/ + figures/ with nbstripout, Google Colab conventions, CLAUDE.md + AGENTS.md, GitHub governance, automatic Git identity (includeIf) and optional Archify diagrams. Fork of jan-project-standard with bug fixes. Use when scaffolding, auditing or standardizing a Python research repository, writing a CONSTITUTION.md, setting up uv/Ruff/pre-commit/CI, or preparing reproducible code for a paper. Úsala al crear, auditar o estandarizar un repositorio de investigación o de curso, redactar un CONSTITUTION.md, configurar uv/Ruff/pre-commit/CI o preparar código reproducible para un artículo."
+description: "Bilingual (EN/ES) project standard for Abel Alvarez Bustos's research and teaching repos (SciML, PINNs, GNNs, remote sensing): Python with uv/Astral, src-layout, Ruff, pre-commit, pytest, Makefile, CONSTITUTION.md as single source of truth, notebooks/ + data/ + figures/ with nbstripout, Google Colab conventions, CLAUDE.md + AGENTS.md, GitHub governance, automatic Git identity (includeIf) and optional Archify diagrams. Use when scaffolding, auditing or standardizing a Python research repository, writing a CONSTITUTION.md, setting up uv/Ruff/pre-commit/CI, or preparing reproducible code for a paper. Úsala al crear, auditar o estandarizar un repositorio de investigación o de curso, redactar un CONSTITUTION.md, configurar uv/Ruff/pre-commit/CI o preparar código reproducible para un artículo."
 license: MIT
 compatibility: Requires Python 3.11+ to run the scaffolder (standard library only). uv, git and optionally gh are recommended for the generated project.
 metadata:
   author: Abel Alvarez Bustos
   based-on: jan-project-standard by Jan Polanco Velasco (MIT)
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # proyecto-abel — Estándar de proyectos de investigación / Research project standard
 
 > **EN** — This skill encodes how Abel's research and course repositories are built and
-> governed: repeatable, reproducible and auditable. It is a fork of
-> [`jan-project-standard`](https://github.com/hamsomp3/jan_skills_repository) (Jan Polanco
-> Velasco, MIT) with bug fixes and a Scientific ML layer (notebooks, data, figures, Colab).
+> governed: repeatable, reproducible and auditable, with a Scientific ML layer (notebooks,
+> data, figures, Colab). Credits for the original standard are in the repository README.
 > The agent should answer the user in the language they write in; generated project files
 > are in Spanish.
 >
 > **ES** — Este skill encapsula cómo se construyen y gobiernan los repositorios de
-> investigación y de curso de Abel. Es un fork de `jan-project-standard` con correcciones
-> y una capa de ML científico. Diagrama del flujo de trabajo: `docs/workflow.md` en la raíz
-> del repositorio del skill.
+> investigación y de curso de Abel, con una capa de ML científico. Diagrama del flujo de
+> trabajo (bilingüe): [`references/workflow.md`](references/workflow.md).
 
 > **Filosofía central:** todo lo que vive dentro de la carpeta del proyecto tiene una
 > instrucción escrita. El documento que la contiene es **`CONSTITUTION.md`**, la
@@ -36,7 +34,7 @@ No hace falta memorizar comandos: describe tu caso en lenguaje natural. Estas so
 piezas que conviene incluir:
 
 ```text
-@jan-project-standard
+@proyecto-abel
 
 Soy:         Abel  |  NO soy Abel (alumno, coautor) → aquí mi nombre y correo
 Estado:      proyecto nuevo  |  proyecto existente (ya tiene README y/o CONSTITUTION.md)
@@ -71,12 +69,14 @@ Restricción: no elimines nada existente; mejora y completa.
 
 ---
 
-## Las 10 reglas no negociables
+## Las 11 reglas no negociables
 
 1. **CONSTITUTION.md primero.** La constitución se crea al inicio y se **actualiza en el
    mismo commit** ante cualquier cambio arquitectónico, tecnológico o de proceso.
 2. **`uv` manda.** Gestión de entornos y dependencias **solo** con `uv`. Prohibido `pip`
    y `requirements.txt`. Dependencias en `pyproject.toml`; `uv.lock` **sí se versiona**.
+   Única excepción: Google Colab (`pip install -e . --no-deps`, ver
+   [`references/colab.md`](references/colab.md)).
 3. **Python 3.13+** fijado en `.python-version` y en `requires-python`.
 4. **src-layout** (`src/<paquete>/`) con build backend `uv_build`, salvo apps simples
    (modo `--app`).
@@ -93,6 +93,9 @@ Restricción: no elimines nada existente; mejora y completa.
 10. **Identidad Git automática:** la carpeta de proyectos hereda nombre, correo y llave SSH
     vía `includeIf` en `~/.gitconfig`. **Perfil A** para Abel (Ubuntu); **Perfil B** para
     cualquier otro usuario (Linux, macOS o Windows), y **solo si lo pide** (ver [`references/git-identity.md`](references/git-identity.md)).
+11. **Reproducibilidad científica** (modo SciML): los notebooks son borradores que importan
+    desde `src/`; semillas fijadas; unidades documentadas; datos fuera de Git con su fuente
+    en `data/README.md`; toda figura de `figures/` sale de un script.
 
 ---
 
@@ -107,9 +110,11 @@ solo la biblioteca estándar de Python (no requiere `uv` para ejecutarse):
 python3 <SKILL_DIR>/scripts/new_project.py \
   --name "Nombre del Proyecto" \
   --path ./nombre-del-proyecto \
-  --description "Descripción breve del proyecto." \
-  --git
+  --description "Descripción breve del proyecto."
 ```
+
+> Por defecto crea: paquete src-layout, capa SciML, `.github/`, `AGENTS.md` + `CLAUDE.md`
+> e inicializa git. Usa `--minimal`, `--app`, `--no-sciml` o `--no-git` para recortar.
 
 > La autoría y el owner se **deducen solos**: `--author`/`--email` salen de
 > `git config user.name` / `user.email`, y `--owner` de `git config github.user`. Puedes
@@ -125,7 +130,7 @@ Opciones más usadas:
 | `--owner` | Cuenta/organización de GitHub (por defecto: `git config github.user` o `<usuario>`). |
 | `--description` | Descripción de una línea (va al README, pyproject y constitución). |
 | `--author` / `--email` | Autoría (por defecto: `git config user.name` / `user.email`). |
-| `--python-version` | Versión de Python (por defecto `3.13`). |
+| `--python-version` | Versión de Python (por defecto `3.13`; usa la de Colab si el paquete debe instalarse allí). |
 | `--app` | Proyecto de aplicación (sin paquete ni build-system), en vez de src-layout. |
 | `--minimal` | Solo lo esencial: sin `.github`, sin `AGENTS.md`/`CLAUDE.md`/`.opencode`, sin capa SciML. Ideal para un repo de paper individual. |
 | `--sciml` / `--no-sciml` | Capa de investigación: `notebooks/`, `data/`, `figures/`, `nbstripout`, grupo `notebooks` y `make notebooks`. Por defecto: **sí**. |
@@ -133,7 +138,7 @@ Opciones más usadas:
 | `--no-types` | Omite `ty` (tipado estático) de dependencias, Makefile y docs. |
 | `--no-github` | No genera `.github/`. |
 | `--no-agents` | No genera `AGENTS.md`, `CLAUDE.md` ni `.opencode/`. |
-| `--git` / `--no-git` | Inicializa el repositorio git (rama `main`). Por defecto: sí (corregido en este fork). |
+| `--git` / `--no-git` | Inicializa el repositorio git (rama `main`). Por defecto: sí; se omite si ya existe `.git/`. |
 | `--sync` | Ejecuta `uv sync` y `uv run pre-commit install` al terminar. |
 | `--force` | Sobrescribe archivos existentes. |
 | `--dry-run` | Muestra qué haría sin escribir nada. |
@@ -296,6 +301,7 @@ Carga estos archivos **solo cuando los necesites** (divulgación progresiva):
 | [`references/agent-context.md`](references/agent-context.md) | `AGENTS.md`, `.opencode/rules/` y tgrep. |
 | [`references/git-identity.md`](references/git-identity.md) | Identidad Git automática (`includeIf`): perfil A (Abel) y perfil B (otros usuarios: Linux, macOS, Windows). |
 | [`references/archify.md`](references/archify.md) | Diagramas de arquitectura interactivos con Archify (instalación, tipos, validate/deliver, README). |
+| [`references/workflow.md`](references/workflow.md) | Diagramas bilingües (Mermaid) del flujo: configurar un proyecto y ciclo diario de investigación. |
 | [`references/colab.md`](references/colab.md) | Google Colab y GPU: instalar el paquete sin romper torch/jax, versión de Python, semillas. |
 | [`references/slidev.md`](references/slidev.md) | Presentaciones con Slidev (proyectos de curso): monolito, hub, reglas de sintaxis, export. |
 

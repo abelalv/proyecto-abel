@@ -43,8 +43,6 @@ git config --show-origin --get user.email   # -> <correo> (desde ~/.gitconfig-pe
 ssh -T git@github.com                        # -> Hi <usuario>!
 ```
 
-> Crédito: la configuración original de ejemplo (Perfil A de Jan Polanco Velasco) está en
-> el repositorio upstream `hamsomp3/jan_skills_repository`.
 
 ---
 

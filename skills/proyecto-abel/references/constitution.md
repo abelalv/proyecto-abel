@@ -102,8 +102,8 @@ marcadores `<!-- ... -->` en las zonas a completar. Consulta el archivo directam
 |-------|----------|--------|
 | 2026-10-01 | Adoptar `uv` como gestor único | Reproducibilidad; prohibido `pip`/`requirements.txt` |
 | 2026-10-01 | Adoptar Conventional Commits | Historial legible y automatizable |
-| 2026-10-02 | Migrar de `requests` a `httpx` | Unificar cliente HTTP con `TestClient` de FastAPI |
-| 2026-10-03 | Usar puerto 5050 para el servidor de tracking | En macOS el puerto 5000 lo ocupa AirPlay (403) |
+| 2026-10-02 | Pasar de diferencias finitas a PINN para el problema inverso | El coeficiente de difusión es desconocido y se estima con los datos |
+| 2026-10-03 | Fijar `torch.manual_seed(42)` y float64 en el entrenamiento | Resultados reproducibles para el revisor; float32 no convergía en la pérdida física |
 ```
 
 ## Ejemplo de invariante de dominio
@@ -111,9 +111,10 @@ marcadores `<!-- ... -->` en las zonas a completar. Consulta el archivo directam
 ```markdown
 ## 3. Invariantes del dominio
 
-- Los montos se manejan como **enteros en COP** (nunca `float`, nunca centavos).
-- La versión de la UVT se lee de una constante versionada por año, no se hardcodea.
-- Toda cifra debe rastrearse a un documento fuente; si no, se marca como `manual`.
+- Todo el código usa **unidades SI**; las conversiones se hacen solo en la carga de datos.
+- Los parámetros físicos (p. ej. difusividad, tasas de contagio) viven en un único módulo
+  `params.py` con su fuente bibliográfica, nunca dispersos como números mágicos.
+- Toda figura del artículo se regenera con un script desde datos versionados o descargables.
 ```
 
 ## Antipatrones (evitar)

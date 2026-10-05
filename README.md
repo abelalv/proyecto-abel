@@ -9,16 +9,16 @@ Python research and teaching repositories: `uv` + Ruff + pre-commit + pytest + M
 `CONSTITUTION.md` as the single source of truth, a Scientific ML layer (notebooks, data,
 figures, Colab) and agent context for Claude Code. Fork of Jan Polanco Velasco's
 [`jan-project-standard`](https://github.com/hamsomp3/jan_skills_repository) with
-[9 bug fixes](ISSUES.md).
+[10 bug fixes](ISSUES.md) and an automated test suite.
 
 **ES** — Un skill que crea, audita y estandariza repositorios de investigación y de curso en
 Python, con una capa de ML científico y contexto para Claude Code. Fork de
-`jan-project-standard` con [9 correcciones](ISSUES.md).
+`jan-project-standard` con [10 correcciones](ISSUES.md) y pruebas automáticas.
 
 | | |
 |---|---|
 | 📘 Skill | [`skills/proyecto-abel/SKILL.md`](skills/proyecto-abel/SKILL.md) |
-| 🗺️ Workflow / Flujo | [`docs/workflow.md`](docs/workflow.md) (bilingual Mermaid diagrams) |
+| 🗺️ Workflow / Flujo | [`references/workflow.md`](skills/proyecto-abel/references/workflow.md) (Mermaid) · [`docs/workflow.html`](docs/workflow.html) (interactive EN/ES page) · SVGs in [`docs/`](docs) |
 | 🐞 Issues / Problemas | [`ISSUES.md`](ISSUES.md) |
 | 📝 Changes / Cambios | [`CHANGELOG.md`](CHANGELOG.md) |
 
@@ -59,15 +59,29 @@ python3 $S/new_project.py --path . --audit                          # audit only
 > **Golden rule / Regla de oro:** without `--force` the scaffolder never overwrites existing
 > files. / Sin `--force` nunca sobrescribe archivos existentes.
 
+## Development / Desarrollo
+
+```bash
+make test        # 16 fast tests: renderer, every mode, audit, identity, SKILL.md
+make test-slow   # + end-to-end: generate a project, uv sync, make check, pre-commit
+make lint        # Ruff on scripts and tests
+```
+
+CI runs `make lint` and `make test-slow` on Python 3.11 and 3.13
+([`.github/workflows/test.yml`](.github/workflows/test.yml)).
+
 ## Structure / Estructura
 
 ```text
 proyecto-abel/
-├── README.md · ISSUES.md · CHANGELOG.md · LICENSE
-├── docs/workflow.md                 # bilingual workflow diagrams
-└── skills/proyecto-abel/
+├── README.md · ISSUES.md · CHANGELOG.md · LICENSE · Makefile
+├── .github/workflows/test.yml       # CI for the skill itself
+├── docs/                            # workflow.html (built) + .fragment.html (source) + SVGs
+├── tools/build_workflow_page.py     # make page → rebuilds docs/workflow.html
+├── tests/test_scaffolder.py         # automated tests
+└── skills/proyecto-abel/            # ← the installable skill
     ├── SKILL.md                     # metadata + instructions
-    ├── references/                  # loaded on demand (incl. colab.md)
+    ├── references/                  # loaded on demand (workflow, colab, git identity…)
     ├── scripts/                     # new_project.py, setup_git_identity.py
     └── assets/templates/            # base · github · agents · sciml
 ```

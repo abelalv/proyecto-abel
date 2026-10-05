@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scaffolder del estándar proyecto-abel (fork de jan-project-standard, de Jan Polanco Velasco).
+"""Scaffolder del estándar de proyectos ``proyecto-abel``.
 
 Genera un proyecto conforme al skill ``proyecto-abel`` copiando las
 plantillas de ``assets/templates`` y sustituyendo sus marcadores. Usa solo la
@@ -367,7 +367,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-types", action="store_true", help="Omite 'ty' (tipado estático).")
     parser.add_argument("--no-github", action="store_true", help="No genera '.github/'.")
     parser.add_argument(
-        "--no-agents", action="store_true", help="No genera 'AGENTS.md' ni '.opencode/'."
+        "--no-agents", action="store_true", help="No genera AGENTS.md, CLAUDE.md ni .opencode/."
     )
     parser.add_argument(
         "--minimal",

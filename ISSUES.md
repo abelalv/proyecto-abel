@@ -2,11 +2,11 @@
 
 Audit of [`hamsomp3/jan_skills_repository`](https://github.com/hamsomp3/jan_skills_repository)
 at commit `0ea4dad` (skill `jan-project-standard` v1.0), done on 2026-10-04 by running the
-scripts and the generated projects. Every item below is **fixed in `proyecto-abel` v1.1.0**
+scripts and the generated projects. Every item below is **fixed in `proyecto-abel`** (v1.1.0, #10 in v1.2.0)
 and can be reported upstream as an issue.
 
 Auditoría del repositorio original (commit `0ea4dad`) ejecutando los scripts y los proyectos
-generados. Todos los puntos están **corregidos en `proyecto-abel` v1.1.0** y pueden
+generados. Todos los puntos están **corregidos en `proyecto-abel`** y pueden
 reportarse al autor original.
 
 **Severity / Severidad:** 🔴 high — breaks output silently · 🟠 medium — behavior differs from docs · 🟡 low — cosmetic or docs
@@ -22,6 +22,7 @@ reportarse al autor original.
 | 7 | 🟡 | `references/github.md` | Points to `references/agent-context.md` for Git identity; the right file is `references/git-identity.md`. | Remite a `agent-context.md` para la identidad Git; el correcto es `git-identity.md`. | Link fixed. |
 | 8 | 🟡 | `scripts/new_project.py` | With `--archify`, the "next steps" message prints a literal `cd <path>` instead of the real path. | Con `--archify`, los "siguientes pasos" muestran `cd <path>` literal. | Uses the real path. |
 | 9 | 🟡 | `scripts/setup_git_identity.py` | Same abbreviation risk as #1 (prefix flags accepted silently). | Mismo riesgo de abreviaturas que el #1. | `allow_abbrev=False`. |
+| 10 | 🟠 | `templates/base/CONSTITUTION.md`, `CONTRIBUTING.md` | With `--minimal`/`--no-github`/`--no-agents`, the generated constitution and contributing guide still describe `.github/`, CI, Dependabot, `AGENTS.md` and `.opencode/`, files that were not created. | Con `--minimal`/`--no-github`/`--no-agents`, la constitución y la guía de contribución siguen describiendo `.github/`, CI, Dependabot, `AGENTS.md` y `.opencode/`, que no se crearon. | Wrapped in `{{#if GITHUB}}` / `{{#if AGENTS}}`; caught by the new test suite. |
 
 ## Design limitations (not bugs) / Limitaciones de diseño (no son errores)
 
@@ -41,4 +42,4 @@ by changing the upstream rules.
 - [ ] `--lang en|es` to render all templates in either language.
 - [ ] `CITATION.cff` template (needed for Zenodo DOI and journal code availability statements).
 - [ ] Optional `reproduce` Makefile target that regenerates every figure in `figures/`.
-- [ ] Open issues #1–#9 upstream (draft text: one issue per row above).
+- [ ] Open issues #1–#10 upstream (draft text: one issue per row above).

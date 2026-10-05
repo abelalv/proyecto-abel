@@ -64,6 +64,6 @@ flowchart LR
     K --> A
 ```
 
-> Rendered copies for slides: [`workflow-setup.svg`](workflow-setup.svg), [`workflow-loop.svg`](workflow-loop.svg). Interactive page: [`workflow-page.html`](workflow-page.html).
-> GitHub renders Mermaid natively. To re-export after editing:
-> `npx -y @mermaid-js/mermaid-cli -i docs/workflow.md -o docs/workflow.svg`.
+> GitHub renderiza Mermaid directamente. Copias en SVG para diapositivas y una página
+> interactiva EN/ES están en la carpeta `docs/` del repositorio del skill.
+> Para re-exportar tras editar: `npx -y @mermaid-js/mermaid-cli -i workflow.md -o workflow.svg`.

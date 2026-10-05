@@ -2,6 +2,23 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [1.2.0] — 2026-10-05
+
+### Fixed / Corregido
+- Invocation template in SKILL.md still said `@jan-project-standard`; now `@proyecto-abel`.
+- Constitution/contributing templates described `.github/`, CI and agent files even when they were not generated. (ISSUES #10)
+- Constitution reference used examples from an unrelated finance project; replaced with SciML examples (SI units, seeds, PINN decisions).
+
+### Added / Añadido
+- Test suite (`tests/`, 17 tests): renderer, every scaffolder mode, audit, no-overwrite, identity script, SKILL.md frontmatter and links, and an end-to-end check (`uv sync` + `make check` + pre-commit) on a generated project.
+- Root `Makefile` (`make test`, `make test-slow`, `make lint`) and GitHub Actions on Python 3.11 and 3.13.
+- SciML and Claude Code layers documented everywhere: rule 11 (scientific reproducibility), Colab exception to the uv rule, `nbstripout` and `make notebooks` in references, conditional SciML sections in the generated constitution.
+- `docs/workflow.html`: standalone bilingual page that opens in any browser.
+
+### Changed / Cambiado
+- Workflow diagrams moved to `skills/proyecto-abel/references/workflow.md` so they ship with the installed skill.
+- Upstream credit kept only in LICENSE, README credits, CHANGELOG, ISSUES and SKILL.md metadata.
+
 ## [1.1.0] — 2026-10-04 · proyecto-abel (fork)
 
 Forked from `hamsomp3/jan_skills_repository` @ `0ea4dad` (`jan-project-standard` v1.0).

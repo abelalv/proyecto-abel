@@ -116,8 +116,8 @@ Se usa la especificación de [Conventional Commits](https://www.conventionalcomm
 
 ## 🐞 Reportar issues
 
-Usa las plantillas disponibles en `.github/ISSUE_TEMPLATE/` (bug, funcionalidad, spike)
-e incluye contexto, pasos para reproducir y evidencia cuando aplique.
+{{#if GITHUB}}Usa las plantillas disponibles en `.github/ISSUE_TEMPLATE/` (bug, funcionalidad, spike)
+e incluye contexto, pasos para reproducir y evidencia cuando aplique.{{/if}}{{#unless GITHUB}}Abre un issue con contexto, pasos para reproducir y evidencia cuando aplique.{{/unless}}
 
 ## 🏛️ Regla de oro: mantener la constitución
 
