@@ -6,7 +6,7 @@ compatibility: Requires Python 3.11+ to run the scaffolder (standard library onl
 metadata:
   author: Abel Alvarez Bustos
   based-on: jan-project-standard by Jan Polanco Velasco (MIT)
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # proyecto-abel — Estándar de proyectos de investigación / Research project standard
@@ -43,6 +43,8 @@ Stack:       Python (uv) · ¿paquete o app? · ¿ty? · ¿SciML (notebooks/data
 Objetivo:    crear desde cero  |  estandarizar SIN borrar  |  solo auditar  |  añadir X
 Restricción: no elimines nada existente; mejora y completa.
 ```
+
+> Ejemplos completos por escenario (prompt + comando + salida): [`references/examples.md`](references/examples.md).
 
 **Reglas de convivencia (obligatorias):**
 
@@ -130,10 +132,10 @@ Opciones más usadas:
 | `--owner` | Cuenta/organización de GitHub (por defecto: `git config github.user` o `<usuario>`). |
 | `--description` | Descripción de una línea (va al README, pyproject y constitución). |
 | `--author` / `--email` | Autoría (por defecto: `git config user.name` / `user.email`). |
-| `--python-version` | Versión de Python (por defecto `3.13`; usa la de Colab si el paquete debe instalarse allí). |
+| `--python-version` | Versión de Python (por defecto: la de un `pyproject.toml` existente, si no `3.13`; usa la de Colab si el paquete debe instalarse allí). |
 | `--app` | Proyecto de aplicación (sin paquete ni build-system), en vez de src-layout. |
 | `--minimal` | Solo lo esencial: sin `.github`, sin `AGENTS.md`/`CLAUDE.md`/`.opencode`, sin capa SciML. Ideal para un repo de paper individual. |
-| `--sciml` / `--no-sciml` | Capa de investigación: `notebooks/`, `data/`, `figures/`, `nbstripout`, grupo `notebooks` y `make notebooks`. Por defecto: **sí**. |
+| `--sciml` / `--no-sciml` | Capa de investigación: `notebooks/`, `data/`, `figures/`, `nbstripout`, grupo `notebooks` y `make notebooks`. Por defecto: **sí** (no en `--minimal`, salvo `--minimal --sciml`). |
 | `--archify` | Incluye la sección **Arquitectura del proyecto** (Archify) en el README y la fila en la constitución. |
 | `--no-types` | Omite `ty` (tipado estático) de dependencias, Makefile y docs. |
 | `--no-github` | No genera `.github/`. |
@@ -301,6 +303,7 @@ Carga estos archivos **solo cuando los necesites** (divulgación progresiva):
 | [`references/agent-context.md`](references/agent-context.md) | `AGENTS.md`, `.opencode/rules/` y tgrep. |
 | [`references/git-identity.md`](references/git-identity.md) | Identidad Git automática (`includeIf`): perfil A (Abel) y perfil B (otros usuarios: Linux, macOS, Windows). |
 | [`references/archify.md`](references/archify.md) | Diagramas de arquitectura interactivos con Archify (instalación, tipos, validate/deliver, README). |
+| [`references/examples.md`](references/examples.md) | **10 ejemplos listos para copiar** (prompts EN/ES + CLI + salida real): paquete de investigación, artículo, curso, repo existente, Colab, identidad Git, Archify. Léelo primero si el usuario no sabe qué pedir. |
 | [`references/workflow.md`](references/workflow.md) | Diagramas bilingües (Mermaid) del flujo: configurar un proyecto y ciclo diario de investigación. |
 | [`references/colab.md`](references/colab.md) | Google Colab y GPU: instalar el paquete sin romper torch/jax, versión de Python, semillas. |
 | [`references/slidev.md`](references/slidev.md) | Presentaciones con Slidev (proyectos de curso): monolito, hub, reglas de sintaxis, export. |

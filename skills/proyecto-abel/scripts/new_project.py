@@ -40,6 +40,8 @@ TREES: list[tuple[str, str]] = [
 ]
 
 # Marcadores de bloque condicional reconocidos.
+DEFAULT_PYTHON = "3.13"
+
 FLAGS = ("PACKAGE", "TYPES", "GITHUB", "AGENTS", "ARCHIFY", "SCIML")
 
 # Fix (proyecto-abel): the body may NOT contain another opening tag, so the regex always
@@ -358,7 +360,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Correo de autoría (por defecto: 'git config user.email' o '<tu-correo>').",
     )
     parser.add_argument(
-        "--python-version", default="3.13", help="Versión de Python (por defecto: 3.13)."
+        "--python-version",
+        default=None,
+        help=(
+            "Versión de Python (por defecto: la de un pyproject.toml existente o "
+            f"{DEFAULT_PYTHON})."
+        ),
     )
 
     parser.add_argument(
@@ -382,7 +389,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--sciml",
         action=argparse.BooleanOptionalAction,
-        default=True,
+        default=None,
         help=(
             "Estructura de investigación SciML: notebooks/, data/, figures/, nbstripout "
             "(por defecto: sí; --no-sciml la omite)."
@@ -412,21 +419,45 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def read_pyproject(target_root: Path) -> dict:
+    """Returns the parsed ``pyproject.toml`` of an existing project (``{}`` if absent/invalid)."""
+    pyproject = target_root / "pyproject.toml"
+    if not pyproject.exists():
+        return {}
+    try:
+        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    except tomllib.TOMLDecodeError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def pyproject_python(data: dict) -> str | None:
+    """Extracts ``X.Y`` from ``project.requires-python`` (``None`` if not declared)."""
+    project = data.get("project", {})
+    raw = str(project.get("requires-python") or "") if isinstance(project, dict) else ""
+    match = re.search(r"(\d+\.\d+)", raw)
+    return match.group(1) if match else None
+
+
+def pyproject_has_ty(data: dict) -> bool:
+    """True if ``ty`` is configured or listed in the ``dev`` dependency group."""
+    tool = data.get("tool", {})
+    groups = data.get("dependency-groups", {})
+    dev = groups.get("dev") if isinstance(groups, dict) else None
+    has_ty = isinstance(tool, dict) and bool(tool.get("ty"))
+    if isinstance(dev, list):
+        has_ty = has_ty or any(re.match(r"ty\b", str(item)) for item in dev)
+    return has_ty
+
+
 def infer_audit_context(target_root: Path, args: argparse.Namespace) -> dict[str, bool]:
     """Rellena ``args`` y deriva las banderas leyendo el proyecto existente.
 
     Permite auditar con precisión un proyecto ya creado sin volver a pasar todos
     los flags originales: el contexto se "captura" del propio repositorio.
     """
-    data: dict = {}
-    pyproject = target_root / "pyproject.toml"
-    if pyproject.exists():
-        try:
-            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-        except tomllib.TOMLDecodeError:
-            data = {}
-
-    project = data.get("project", {}) if isinstance(data, dict) else {}
+    data = read_pyproject(target_root)
+    project = data.get("project", {})
     if isinstance(project, dict):
         if not args.repo and project.get("name"):
             args.repo = str(project["name"])
@@ -442,9 +473,8 @@ def infer_audit_context(target_root: Path, args: argparse.Namespace) -> dict[str
         if match:
             args.owner = args.owner or match.group(1)
             args.repo = args.repo or match.group(2)
-        version = re.search(r"(\d+\.\d+)", str(project.get("requires-python") or ""))
-        if version and args.python_version == "3.13":
-            args.python_version = version.group(1)
+        if args.python_version is None:
+            args.python_version = pyproject_python(data)
 
     if not args.name:
         constitution = target_root / "CONSTITUTION.md"
@@ -457,6 +487,19 @@ def infer_audit_context(target_root: Path, args: argparse.Namespace) -> dict[str
             if match:
                 args.name = match.group(1)
 
+    if not args.description:
+        # Fix (proyecto-abel): recover the description from the constitution so files that
+        # embed it (AGENTS.md, CONSTITUTION.md) are not reported as DIFIERE by mistake.
+        constitution = target_root / "CONSTITUTION.md"
+        if constitution.exists():
+            match = re.search(
+                r"^\|\s*\*\*Descripción\*\*\s*\|\s*(.+?)\s*\|\s*$",
+                constitution.read_text(encoding="utf-8"),
+                re.MULTILINE,
+            )
+            if match and "<!--" not in match.group(1):
+                args.description = match.group(1)
+
     if not args.package:
         src = target_root / "src"
         if src.is_dir():
@@ -468,12 +511,7 @@ def infer_audit_context(target_root: Path, args: argparse.Namespace) -> dict[str
             if packages:
                 args.package = packages[0]
 
-    tool = data.get("tool", {}) if isinstance(data, dict) else {}
-    groups = data.get("dependency-groups", {}) if isinstance(data, dict) else {}
-    dev = groups.get("dev") if isinstance(groups, dict) else None
-    has_ty = isinstance(tool, dict) and bool(tool.get("ty"))
-    if isinstance(dev, list):
-        has_ty = has_ty or any(str(item).startswith("ty") for item in dev)
+    has_ty = pyproject_has_ty(data)
 
     readme = target_root / "README.md"
     readme_text = (
@@ -522,6 +560,39 @@ def run_audit(
     return 0
 
 
+def print_pyproject_merge(
+    target_root: Path, flags: dict[str, bool], data: dict, variables: dict[str, str]
+) -> None:
+    """Prints what to run/paste so a kept pyproject.toml matches the standard."""
+    groups = data.get("dependency-groups", {})
+    dev = " ".join(str(d) for d in (groups.get("dev") or [])) if isinstance(groups, dict) else ""
+    wanted = [pkg for pkg in ("pre-commit", "pytest", "ruff") if pkg not in dev]
+    print("\n── pyproject.toml existente (no se modificó) ─────────────")
+    print("  Alinea las dependencias con el estándar / Align it with the standard:")
+    if wanted:
+        print(f"    uv add --dev {' '.join(wanted)}")
+    if flags["SCIML"] and not (isinstance(groups, dict) and "notebooks" in groups):
+        print("    uv add --group notebooks ipykernel nbstripout")
+    if (target_root / "requirements.txt").exists():
+        print("    uv add -r requirements.txt && rm requirements.txt")
+    if not flags["TYPES"]:
+        print("  (ty no está en tu pyproject: se omitió. Para activarlo: uv add --dev ty)")
+
+    # Tool tables the Makefile and tests rely on; print the missing ones ready to paste.
+    tool = data.get("tool", {}) if isinstance(data.get("tool"), dict) else {}
+    template = (TEMPLATES_DIR / "base" / "pyproject.toml").read_text(encoding="utf-8")
+    rendered = render(template, variables, flags, set())
+    tail = rendered[rendered.index("[tool.ruff]") :]
+    blocks = re.split(r"\n(?=\[tool\.)", tail)
+    needed = [b.strip() for b in blocks if b.split("]")[0].strip("[").split(".")[1] not in tool]
+    if needed:
+        print("  Añade al final de pyproject.toml / Append to pyproject.toml:\n")
+        for block in needed:
+            for line in block.splitlines():
+                print(f"    {line}")
+            print()
+
+
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
@@ -532,7 +603,10 @@ def main() -> int:
     if args.minimal:
         args.no_github = True
         args.no_agents = True
-        args.sciml = False
+    # Fix (proyecto-abel): '--minimal --sciml' used to drop SciML anyway. An explicit
+    # --sciml/--no-sciml now always wins; otherwise SciML is on except in --minimal.
+    if args.sciml is None:
+        args.sciml = not args.minimal
 
     flags = {
         "PACKAGE": not args.app,
@@ -544,10 +618,22 @@ def main() -> int:
     }
 
     target_root = Path(args.path).expanduser().resolve()
+    existing = read_pyproject(target_root)
+    keep_pyproject = bool(existing) and not args.force and not args.audit
 
     if args.audit:
         for key, value in infer_audit_context(target_root, args).items():
             flags[key] = value
+    elif keep_pyproject:
+        # Fix (proyecto-abel): when completing a project whose pyproject.toml is kept, the
+        # generated files must agree with it (Python version, ty), or `make check` breaks.
+        if args.python_version is None:
+            args.python_version = pyproject_python(existing)
+        if flags["TYPES"] and not pyproject_has_ty(existing):
+            flags["TYPES"] = False
+
+    if args.python_version is None:
+        args.python_version = DEFAULT_PYTHON
 
     if not args.name:
         args.name = target_root.name
@@ -596,6 +682,9 @@ def main() -> int:
     )
     if missing:
         print(f"  ⚠ marcadores sin resolver: {', '.join(sorted(missing))}")
+
+    if keep_pyproject:
+        print_pyproject_merge(target_root, flags, existing, variables)
 
     print("\n── Siguientes pasos ──────────────────────────────────────")
     print("  1. Completa las secciones marcadas de CONSTITUTION.md.")

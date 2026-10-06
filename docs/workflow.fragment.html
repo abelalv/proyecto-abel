@@ -86,15 +86,15 @@ footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line)
 <div class="wrap">
   <header>
     <div class="topline">
-      <span class="eyebrow">Agent Skill · v1.2.0</span>
+      <span class="eyebrow">Agent Skill · v1.3.0</span>
       <div class="toggle" role="group" aria-label="Language / Idioma">
         <button type="button" id="btn-en" data-set="en" aria-pressed="false">English</button>
         <button type="button" id="btn-es" data-set="es" aria-pressed="false">Español</button>
       </div>
     </div>
     <h1>proyecto-abel</h1>
-    <p class="lede en">How the skill sets up a Python research repository, the daily loop that keeps it reproducible, and the ten upstream problems the fork fixes. Diagram nodes show both languages; the toggle switches the surrounding text.</p>
-    <p class="lede es">Cómo el skill configura un repositorio de investigación en Python, el ciclo diario que lo mantiene reproducible y los diez problemas del original que el fork corrige. Los nodos de los diagramas son bilingües; el selector cambia el texto alrededor.</p>
+    <p class="lede en">How the skill sets up a Python research repository, the daily loop that keeps it reproducible, and the twelve problems found and fixed in this fork. Diagram nodes show both languages; the toggle switches the surrounding text.</p>
+    <p class="lede es">Cómo el skill configura un repositorio de investigación en Python, el ciclo diario que lo mantiene reproducible y los doce problemas encontrados y corregidos en este fork. Los nodos de los diagramas son bilingües; el selector cambia el texto alrededor.</p>
   </header>
 
   <section aria-labelledby="s1">
@@ -171,8 +171,8 @@ flowchart LR
     <div class="sec-head">
       <span class="eyebrow">3</span>
       <h2 id="s3"><span class="en">Problems found upstream</span><span class="es">Problemas encontrados en el original</span></h2>
-      <p class="en">Found by running <code>hamsomp3/jan_skills_repository</code> at commit <code>0ea4dad</code> and its generated projects. All ten are fixed in this fork and covered by automated tests.</p>
-      <p class="es">Encontrados ejecutando <code>hamsomp3/jan_skills_repository</code> (commit <code>0ea4dad</code>) y los proyectos que genera. Los diez están corregidos en este fork y cubiertos por pruebas automáticas.</p>
+      <p class="en">Found by running <code>hamsomp3/jan_skills_repository</code> at commit <code>0ea4dad</code> and its generated projects. Ten come from the original; #11–#12 were found while writing the usage examples. All twelve are fixed and covered by automated tests.</p>
+      <p class="es">Encontrados ejecutando <code>hamsomp3/jan_skills_repository</code> (commit <code>0ea4dad</code>) y los proyectos que genera. Diez vienen del original; el #11 y el #12 aparecieron al escribir los ejemplos de uso. Los doce están corregidos y cubiertos por pruebas automáticas.</p>
     </div>
     <div class="legend">
       <span class="chip high"><span class="en">High</span><span class="es">Alta</span></span><span class="en">breaks output silently</span><span class="es">rompe la salida sin aviso</span>
@@ -247,7 +247,15 @@ const ISSUES = [
   ["med", "CONSTITUTION.md · CONTRIBUTING.md",
    "With <code>--minimal</code>, the generated docs still describe <code>.github/</code>, CI and agent files that were never created.",
    "Con <code>--minimal</code>, los documentos generados siguen describiendo <code>.github/</code>, CI y archivos de agentes que no se crearon.",
-   "Conditional blocks; found by the new test suite.", "Bloques condicionales; detectado por las nuevas pruebas."]
+   "Conditional blocks; found by the new test suite.", "Bloques condicionales; detectado por las nuevas pruebas."],
+  ["med", "scripts/new_project.py",
+   "<code>--minimal --sciml</code> still dropped <code>notebooks/</code>, <code>data/</code> and <code>figures/</code>.",
+   "<code>--minimal --sciml</code> seguía quitando <code>notebooks/</code>, <code>data/</code> y <code>figures/</code>.",
+   "Explicit <code>--sciml</code> always wins.", "Un <code>--sciml</code> explícito siempre gana."],
+  ["high", "scripts/new_project.py",
+   "Completing an existing repo kept its <code>pyproject.toml</code> but generated files for another Python version and <code>ty</code>, so <code>make check</code> failed.",
+   "Al completar un repo existente se conservaba su <code>pyproject.toml</code>, pero los archivos generados asumían otra versión de Python y <code>ty</code>: <code>make check</code> fallaba.",
+   "Reads the kept pyproject and prints the exact <code>uv add</code> commands and tables to add.", "Lee el pyproject existente e imprime los comandos <code>uv add</code> y las tablas exactas que faltan."]
 ];
 const SEV = { high: ["High", "Alta"], med: ["Medium", "Media"], low: ["Low", "Baja"] };
 document.getElementById("issues").innerHTML = ISSUES.map((r, i) => `

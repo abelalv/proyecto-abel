@@ -181,6 +181,71 @@ def test_audit_reports_all_ok_on_fresh_project(tmp_path):
     assert "DIFIERE: 0" in result.stdout and "FALTA: 0" in result.stdout
 
 
+def test_minimal_with_explicit_sciml_keeps_research_folders(tmp_path):
+    proj = scaffold(tmp_path, "--minimal", "--sciml", "--no-git")
+    for rel in ["notebooks", "data", "figures"]:
+        assert (proj / rel).is_dir(), f"--minimal --sciml must keep {rel}/"
+    assert not (proj / ".github").exists()
+
+
+def test_completing_existing_project_follows_its_pyproject(tmp_path):
+    # Arrange: a legacy repo with its own README, pyproject (Python 3.12, no ty) and notebooks
+    repo = tmp_path / "legacy"
+    (repo / "notebooks").mkdir(parents=True)
+    (repo / "README.md").write_text("# Mi repo viejo\n")
+    (repo / "requirements.txt").write_text("numpy\n")
+    (repo / "pyproject.toml").write_text(
+        '[project]\nname = "uhi-bogota"\nversion = "0.1.0"\n'
+        'requires-python = ">=3.12"\ndependencies = []\n'
+    )
+
+    # Act
+    done = run(NEW_PROJECT, "--path", str(repo), "--name", "UHI Bogota",
+               "--description", "Isla de calor.", "--app", "--no-github", "--no-git")  # fmt: skip
+    audit = run(NEW_PROJECT, "--path", str(repo), "--audit")
+
+    # Assert: user files kept, generated files agree with the kept pyproject
+    assert done.returncode == 0, done.stderr
+    assert (repo / "README.md").read_text() == "# Mi repo viejo\n"
+    assert (repo / ".python-version").read_text().strip() == "3.12"
+    assert "typecheck:" not in (repo / "Makefile").read_text()
+    assert "uv add --dev pre-commit pytest ruff" in done.stdout
+    assert "uv add -r requirements.txt" in done.stdout
+    assert "[tool.pytest.ini_options]" in done.stdout
+    assert "DIFIERE: 2" in audit.stdout and "FALTA: 0" in audit.stdout
+
+
+def example_commands() -> list[str]:
+    """CLI lines from the examples guide and the README (backslash continuations joined)."""
+    commands = []
+    for doc in (SKILL / "references" / "examples.md", ROOT / "README.md"):
+        blocks = re.findall(r"```bash\n(.*?)```", doc.read_text(encoding="utf-8"), re.S)
+        for block in blocks:
+            for line in block.replace("\\\n", " ").splitlines():
+                line = line.split("  #")[0].strip()
+                if line.startswith("python3 $S/"):
+                    commands.append(line)
+    return commands
+
+
+@pytest.mark.parametrize("command", example_commands())
+def test_every_documented_example_command_runs(tmp_path, command):
+    # Each example runs in a fresh folder with a throwaway HOME (identity examples)
+    env = {**os.environ, "HOME": str(tmp_path), "S": str(SKILL / "scripts")}
+    env["PATH"] = f"{Path(sys.executable).parent}:{env['PATH']}"
+    work = tmp_path / "work"
+    work.mkdir()
+    result = subprocess.run(
+        ["bash", "-c", command], cwd=work, env=env, capture_output=True, text=True
+    )
+    assert result.returncode == 0, f"{command}\n{result.stdout}\n{result.stderr}"
+    assert "marcadores sin resolver" not in result.stdout
+
+
+def test_examples_guide_has_at_least_ten_commands():
+    assert len(example_commands()) >= 10
+
+
 # --------------------------------------------------------------------------- identity
 
 

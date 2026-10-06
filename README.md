@@ -9,11 +9,11 @@ Python research and teaching repositories: `uv` + Ruff + pre-commit + pytest + M
 `CONSTITUTION.md` as the single source of truth, a Scientific ML layer (notebooks, data,
 figures, Colab) and agent context for Claude Code. Fork of Jan Polanco Velasco's
 [`jan-project-standard`](https://github.com/hamsomp3/jan_skills_repository) with
-[10 bug fixes](ISSUES.md) and an automated test suite.
+[12 bug fixes](ISSUES.md) and an automated test suite.
 
 **ES** — Un skill que crea, audita y estandariza repositorios de investigación y de curso en
 Python, con una capa de ML científico y contexto para Claude Code. Fork de
-`jan-project-standard` con [10 correcciones](ISSUES.md) y pruebas automáticas.
+`jan-project-standard` con [12 correcciones](ISSUES.md) y pruebas automáticas.
 
 | | |
 |---|---|
@@ -33,27 +33,27 @@ git clone git@github.com:<user>/proyecto-abel.git
 cp -r proyecto-abel/skills/proyecto-abel ~/.claude/skills/
 ```
 
-## Quick use / Uso rápido
+## Examples / Ejemplos
 
-Natural language / Lenguaje natural:
+Full guide with 10 scenarios (prompts in EN/ES, commands and real output):
+**[`references/examples.md`](skills/proyecto-abel/references/examples.md)**. The most common ones:
 
-```text
-@proyecto-abel create a new research project "PINN Heat Equation",
-package mode, with notebooks, for a Q1 paper.
-
-@proyecto-abel audita este repositorio sin modificar nada y dime qué falta.
-
-@proyecto-abel crea un proyecto mínimo para mis estudiantes de Modelación (--app).
-```
-
-CLI (no agent / sin agente):
+| You want to… / Quieres… | Ask the agent / Pídele al agente | CLI |
+|---|---|---|
+| Start a research package | `@proyecto-abel create a research project "PINN Heat", package mode, with notebooks` | `--name "PINN Heat"` |
+| Repo for one paper | `@proyecto-abel repo mínimo para mi artículo, con notebooks y figuras` | `--minimal --sciml` |
+| Workshop for students | `@proyecto-abel crea un taller simple tipo app para mis estudiantes` | `--app --no-sciml --no-github` |
+| Check an existing repo | `@proyecto-abel audita este repo sin modificar nada` | `--path . --audit` |
+| Complete it safely | `@proyecto-abel completa lo que falta sin borrar nada` | `--path . --name "..."` |
+| Use it in Colab | `@proyecto-abel prepara el notebook para Colab` | `--python-version 3.12` |
+| Log a decision | `@proyecto-abel registra en la constitución que cambiamos a PINN` | — |
 
 ```bash
-S=skills/proyecto-abel/scripts
-python3 $S/new_project.py --name "PINN Heat" --description "..."   # SciML + git by default
-python3 $S/new_project.py --name "Paper X" --minimal --sciml        # single-author paper
-python3 $S/new_project.py --name "Taller 1" --app --no-sciml        # course app
-python3 $S/new_project.py --path . --audit                          # audit only, writes nothing
+S=skills/proyecto-abel/scripts      # or ~/.claude/skills/proyecto-abel/scripts once installed
+python3 $S/new_project.py --name "PINN Heat" --description "PINN for the heat equation."
+python3 $S/new_project.py --name "Paper X" --minimal --sciml
+python3 $S/new_project.py --name "Taller 1" --app --no-sciml --no-github
+python3 $S/new_project.py --path . --audit
 ```
 
 > **Golden rule / Regla de oro:** without `--force` the scaffolder never overwrites existing
@@ -62,7 +62,7 @@ python3 $S/new_project.py --path . --audit                          # audit only
 ## Development / Desarrollo
 
 ```bash
-make test        # 16 fast tests: renderer, every mode, audit, identity, SKILL.md
+make test        # fast tests: renderer, every mode, audit, identity, SKILL.md, examples
 make test-slow   # + end-to-end: generate a project, uv sync, make check, pre-commit
 make lint        # Ruff on scripts and tests
 ```

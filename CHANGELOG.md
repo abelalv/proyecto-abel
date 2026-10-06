@@ -2,6 +2,17 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/)
 
+## [1.3.0] — 2026-10-06
+
+### Added / Añadido
+- `references/examples.md`: 10 copy-paste scenarios with prompts in EN/ES, CLI commands and real output (research package, paper, course workshop, existing repo, dry run, Colab, constitution decision, Git identity, Archify, daily loop) plus prompt-writing tips.
+- README "Examples" table; SKILL.md links the guide.
+- Tests run every documented example command (15) so the guide cannot drift from the code.
+
+### Fixed / Corregido
+- `--minimal --sciml` now keeps `notebooks/`, `data/`, `figures/`. (ISSUES #11)
+- Completing an existing repository now follows its `pyproject.toml` (Python version, `ty`) and prints the `uv add` commands and `[tool.*]` tables needed to make `make check` pass. (#12)
+
 ## [1.2.0] — 2026-10-05
 
 ### Fixed / Corregido
